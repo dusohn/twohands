@@ -2,7 +2,7 @@
 
 주식회사 투핸즈의 자비스 원장을 읽어 월별 현금흐름을 보여주는 페이지입니다.
 
-페이지: [site/index.html](site/index.html)
+페이지: https://rawcdn.githack.com/dusohn/twohands/2526f650e13dea028dbb833d0d161cc66f30275c/site/index.html
 
 숫자는 `data/cashflow.json`에서 읽습니다. 기본 브랜치에 올라간 뒤에는 매일 아침 그 파일을 다시 받습니다.
 
