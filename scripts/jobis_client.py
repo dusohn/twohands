@@ -196,6 +196,7 @@ def reduce_snapshot(
     bank_in: dict[tuple[int, int], int] = defaultdict(int)
     bank_out: dict[tuple[int, int], int] = defaultdict(int)
     card_paid: dict[tuple[int, int], int] = defaultdict(int)
+    vat_paid: dict[tuple[int, int], int] = defaultdict(int)
     for row in bank:
         stamp = str(row.get("trandate") or "")
         if len(stamp) < 6:
@@ -207,6 +208,8 @@ def reduce_snapshot(
         bank_out[key] += outgoing
         if row.get("cate_name") == "신용/체크카드결제":
             card_paid[key] += outgoing
+        elif row.get("cate_name") == "부가세납부":
+            vat_paid[key] += outgoing
 
     mix_key = (as_of.year, as_of.month - 1) if as_of.month > 1 else (as_of.year - 1, 12)
     mix: dict[str, int] = defaultdict(int)
@@ -238,6 +241,7 @@ def reduce_snapshot(
                 "bankIn": bank_in.get(key, 0),
                 "bankOut": bank_out.get(key, 0),
                 "cardPaid": card_paid.get(key, 0),
+                "vatPaid": vat_paid.get(key, 0),
                 "endCash": balances.get(key, 0),
             }
         )

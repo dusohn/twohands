@@ -26,6 +26,7 @@ class MonthActual:
     bank_in: int
     bank_out: int
     card_paid: int
+    vat_paid: int = 0
 
 
 @dataclass(frozen=True)
@@ -45,10 +46,22 @@ class PlannedSale:
 
 
 def vat_due(year: int, month: int) -> tuple[int, int]:
-    """When a sale's VAT leaves the bank: H1 in July, H2 in January."""
+    """Output VAT leaves the bank in the quarterly filing month.
+
+    January–March is paid in April, April–June in July, July–September in
+    October, and October–December in January of the next year.
+    """
+    if month <= 3:
+        return year, 4
     if month <= 6:
         return year, 7
+    if month <= 9:
+        return year, 10
     return year + 1, 1
+
+
+def sales_vat(sales: int) -> int:
+    return half_up(Decimal(sales) * Decimal("0.1"))
 
 
 def _key(year: int, month: int) -> tuple[int, int]:
@@ -94,12 +107,7 @@ def build_forecast(
         anchor_card = card_run_rate
 
     booked = _booked_plans(plans, by_month, as_of, month_complete)
-    vat_by_month: dict[tuple[int, int], int] = {}
-    for plan in booked:
-        due = vat_due(plan.year, plan.month)
-        if due < current or (due == current and month_complete):
-            continue
-        vat_by_month[due] = vat_by_month.get(due, 0) + plan.vat
+    vat_by_month = _vat_by_month(actuals, booked, current, month_complete)
 
     rows: list[dict] = []
     ordered = sorted(by_month)
@@ -111,8 +119,9 @@ def build_forecast(
             rows.append(_actual_row(row))
             continue
         remaining_bill = max(0, last_full_card - row.card_paid)
+        unpaid_vat = max(0, vat_by_month.get(key, 0) - row.vat_paid)
         plan_supply, plan_gross = _plan_amounts(booked, key, row.sales)
-        end_cash = cash_now - remaining_bill + plan_gross
+        end_cash = cash_now - remaining_bill - unpaid_vat + plan_gross
         rows.append(
             {
                 "year": row.year,
@@ -122,8 +131,8 @@ def build_forecast(
                 "purchase": row.purchase,
                 "card": card_run_rate,
                 "bankIn": row.bank_in + plan_gross,
-                "bankOut": row.bank_out + remaining_bill + vat_by_month.get(key, 0),
-                "endCash": end_cash - vat_by_month.get(key, 0),
+                "bankOut": row.bank_out + remaining_bill + unpaid_vat,
+                "endCash": end_cash,
             }
         )
 
@@ -164,6 +173,34 @@ def build_forecast(
         "depletion": depletion,
         "rows": rows,
     }
+
+
+def _vat_by_month(
+    actuals: list[MonthActual],
+    booked: list[PlannedSale],
+    current: tuple[int, int],
+    month_complete: bool,
+) -> dict[tuple[int, int], int]:
+    """Output VAT still to leave the bank, keyed by the filing month.
+
+    Closed filing months stay on the Jobis balance, so they are omitted.
+    A filing month that is still open is reduced later by VAT already paid.
+    """
+    due_amounts: dict[tuple[int, int], int] = {}
+
+    def add(year: int, month: int, amount: int) -> None:
+        if amount <= 0:
+            return
+        due = vat_due(year, month)
+        if due < current or (due == current and month_complete):
+            return
+        due_amounts[due] = due_amounts.get(due, 0) + amount
+
+    for row in actuals:
+        add(row.year, row.month, sales_vat(row.sales))
+    for plan in booked:
+        add(plan.year, plan.month, plan.vat)
+    return due_amounts
 
 
 def _booked_plans(
