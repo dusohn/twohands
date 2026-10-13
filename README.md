@@ -4,6 +4,8 @@
 
 페이지: [site/index.html](site/index.html)
 
+숫자는 `data/cashflow.json`에서 읽습니다. 기본 브랜치에 올라간 뒤에는 매일 아침 그 파일을 다시 받습니다.
+
 자비스에서 읽은 최신 숫자는 `data/cashflow.json`입니다. 예정 매출은 `data/plans.json`에 있고, 매일 갱신해도 그 파일은 유지됩니다. 계좌번호와 카드번호는 저장하지 않습니다.
 
 ## 매일 07:00 갱신

@@ -1,11 +1,11 @@
 const LOCAL = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+const PUBLISHED = [
+  "https://raw.githubusercontent.com/dusohn/twohands/main/data/cashflow.json",
+  "https://raw.githubusercontent.com/dusohn/twohands/cursor/cashflow-page-64ed/data/cashflow.json",
+];
 const DATA_CANDIDATES = LOCAL
-  ? ["../data/cashflow.json", "./cashflow.json"]
-  : [
-      "https://raw.githubusercontent.com/dusohn/twohands/main/data/cashflow.json",
-      "../data/cashflow.json",
-      "./cashflow.json",
-    ];
+  ? ["../data/cashflow.json", "./cashflow.json", ...PUBLISHED]
+  : [...PUBLISHED, "../data/cashflow.json", "./cashflow.json"];
 
 const won = (value) => {
   const sign = value < 0 ? "-" : "";
