@@ -253,7 +253,7 @@ function renderCards(data) {
       <h2>${esc(data.cardMixMonth || "")} 카드 구성 <span class="file-tag">자비스 카드매입</span></h2>
       <p class="cf-note">지난달 승인 금액입니다. 취소는 제외하고, 해외 결제는 원화 환산 금액을 씁니다.</p>
       <div class="tbl-wrap"><table class="cf">
-        <tr><th>분류</th><th class="num">금액</th><th class="num">비중</th></tr>
+        <tr><th style="text-align:left">분류</th><th class="num">금액</th><th class="num">비중</th></tr>
         ${body}
         <tr class="row-sum"><td class="sticky-col">합계</td><td class="num">${fmt(mix.reduce((sum, row) => sum + row.amount, 0))}</td><td class="num">100%</td></tr>
       </table></div>
