@@ -12,7 +12,7 @@ from zoneinfo import ZoneInfo
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from forecast import MonthActual, PlannedSale, apply_actual_balances, build_forecast
+from forecast import MonthActual, PlannedExpense, PlannedSale, apply_actual_balances, build_forecast
 from jobis_client import JobisClient
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -32,7 +32,7 @@ def main() -> int:
     client = JobisClient(email, password)
     client.login()
     snapshot = client.snapshot(today)
-    plans = _load_plans()
+    plans, expenses = _load_plans()
     as_of = datetime.strptime(snapshot["asOf"], "%Y-%m-%d").date()
     actuals = [
         MonthActual(
@@ -52,7 +52,7 @@ def main() -> int:
     for label, amount in snapshot["balances"].items():
         year, month = label.split("-")
         balances[(int(year), int(month))] = amount
-    forecast = build_forecast(actuals, as_of, snapshot["cashNow"], plans)
+    forecast = build_forecast(actuals, as_of, snapshot["cashNow"], plans, expenses=expenses)
     apply_actual_balances(forecast["rows"], balances)
 
     document = {
@@ -66,10 +66,8 @@ def main() -> int:
         "currentMonthCard": forecast["currentMonthCard"],
         "monthComplete": forecast["monthComplete"],
         "depletion": forecast["depletion"],
-        "plans": [
-            {"date": f"{plan.year}-{plan.month:02d}-{plan.day:02d}", "supply": plan.supply}
-            for plan in plans
-        ],
+        "plans": [_plan_document(plan) for plan in plans],
+        "expenses": [_plan_document(expense) for expense in expenses],
         "cardMixMonth": snapshot["cardMixMonth"],
         "cardMix": snapshot["cardMix"],
         "assumptions": [
@@ -77,9 +75,10 @@ def main() -> int:
             "이번 달 카드 지출은 자비스 지출 리포트의 경과일을 월말로 늘린 금액입니다.",
             "그 다음 달부터의 월 지출은 지난달 카드와 이번 달 예상 카드의 평균입니다.",
             "예정 매출의 통장 입금은 공급가액에 부가세 10%를 더한 금액입니다.",
+            "예정 지출의 통장 출금은 공급가액에 부가세 10%를 더한 금액입니다. data/plans.json의 expenses에서 수정합니다.",
             "매출 부가세는 1월, 4월, 7월, 10월에 납부합니다. 1–3월분은 4월, 4–6월분은 7월, 7–9월분은 10월, 10–12월분은 다음 해 1월입니다.",
             "매입세액 공제는 빼지 않습니다. 이미 통장에서 나간 부가세는 다시 빼지 않습니다.",
-            "예금 이자는 예상하지 않습니다. 예정 매출 외에 미래 매출은 0원입니다.",
+            "예금 이자는 예상하지 않습니다. 예정 매출 외에 미래 매출은 0원이고, 예정 지출 외에 미래 매입은 0원입니다.",
         ],
         "rows": forecast["rows"],
     }
@@ -92,15 +91,40 @@ def main() -> int:
     return 0
 
 
-def _load_plans() -> list[PlannedSale]:
+def _load_plans() -> tuple[list[PlannedSale], list[PlannedExpense]]:
     if not PLANS_PATH.exists():
-        return []
+        return [], []
     payload = json.loads(PLANS_PATH.read_text(encoding="utf-8"))
-    plans = []
-    for item in payload.get("sales") or []:
-        year, month, day = (int(part) for part in str(item["date"]).split("-"))
-        plans.append(PlannedSale(year, month, day, int(item["supply"])))
-    return plans
+    return (
+        [_sale(item) for item in payload.get("sales") or []],
+        [_expense(item) for item in payload.get("expenses") or []],
+    )
+
+
+def _sale(item: dict) -> PlannedSale:
+    year, month, day = _date_parts(item["date"])
+    return PlannedSale(year, month, day, int(item["supply"]))
+
+
+def _expense(item: dict) -> PlannedExpense:
+    year, month, day = _date_parts(item["date"])
+    return PlannedExpense(year, month, day, int(item["supply"]), str(item.get("note") or ""))
+
+
+def _date_parts(value: str) -> tuple[int, int, int]:
+    year, month, day = (int(part) for part in str(value).split("-"))
+    return year, month, day
+
+
+def _plan_document(plan: PlannedSale | PlannedExpense) -> dict:
+    document = {
+        "date": f"{plan.year}-{plan.month:02d}-{plan.day:02d}",
+        "supply": plan.supply,
+    }
+    note = getattr(plan, "note", "")
+    if note:
+        document["note"] = note
+    return document
 
 
 if __name__ == "__main__":

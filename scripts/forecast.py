@@ -45,6 +45,25 @@ class PlannedSale:
         return self.supply + self.vat
 
 
+@dataclass(frozen=True)
+class PlannedExpense:
+    """A future payment entered as supply. Cash leaves as supply plus 10% VAT."""
+
+    year: int
+    month: int
+    day: int
+    supply: int
+    note: str = ""
+
+    @property
+    def vat(self) -> int:
+        return half_up(Decimal(self.supply) * Decimal("0.1"))
+
+    @property
+    def gross(self) -> int:
+        return self.supply + self.vat
+
+
 def vat_due(year: int, month: int) -> tuple[int, int]:
     """Output VAT leaves the bank in the quarterly filing month.
 
@@ -79,6 +98,7 @@ def build_forecast(
     cash_now: int,
     plans: list[PlannedSale],
     horizon_years: int = 3,
+    expenses: list[PlannedExpense] | None = None,
 ) -> dict:
     if not actuals:
         raise ValueError("no actual months")
@@ -107,6 +127,7 @@ def build_forecast(
         anchor_card = card_run_rate
 
     booked = _booked_plans(plans, by_month, as_of, month_complete)
+    booked_expenses = _open_expenses(expenses or [], as_of, month_complete)
     vat_by_month = _vat_by_month(actuals, booked, current, month_complete)
 
     rows: list[dict] = []
@@ -121,17 +142,18 @@ def build_forecast(
         remaining_bill = max(0, last_full_card - row.card_paid)
         unpaid_vat = max(0, vat_by_month.get(key, 0) - row.vat_paid)
         plan_supply, plan_gross = _plan_amounts(booked, key, row.sales)
-        end_cash = cash_now - remaining_bill - unpaid_vat + plan_gross
+        expense_supply, expense_gross = _expense_amounts(booked_expenses, key)
+        end_cash = cash_now - remaining_bill - unpaid_vat + plan_gross - expense_gross
         rows.append(
             {
                 "year": row.year,
                 "month": row.month,
-                "status": "예정" if plan_supply else "진행",
+                "status": "예정" if plan_supply or expense_supply else "진행",
                 "sales": row.sales + plan_supply,
-                "purchase": row.purchase,
+                "purchase": row.purchase + expense_supply,
                 "card": card_run_rate,
                 "bankIn": row.bank_in + plan_gross,
-                "bankOut": row.bank_out + remaining_bill + unpaid_vat,
+                "bankOut": row.bank_out + remaining_bill + unpaid_vat + expense_gross,
                 "endCash": end_cash,
             }
         )
@@ -144,16 +166,17 @@ def build_forecast(
     guard = _key(as_of.year + horizon_years + 6, 12)
     while cursor <= guard:
         plan_supply, plan_gross = _plan_amounts(booked, cursor, already_sales=0)
+        expense_supply, expense_gross = _expense_amounts(booked_expenses, cursor)
         vat = vat_by_month.get(cursor, 0)
-        bank_out = bill + vat
+        bank_out = bill + vat + expense_gross
         cash = cash - bank_out + plan_gross
         rows.append(
             {
                 "year": cursor[0],
                 "month": cursor[1],
-                "status": "예정" if plan_supply else "예상",
+                "status": "예정" if plan_supply or expense_supply else "예상",
                 "sales": plan_supply,
-                "purchase": 0,
+                "purchase": expense_supply,
                 "card": spend,
                 "bankIn": plan_gross,
                 "bankOut": bank_out,
@@ -221,6 +244,33 @@ def _booked_plans(
             continue
         kept.append(plan)
     return kept
+
+
+def _open_expenses(
+    expenses: list[PlannedExpense],
+    as_of: date,
+    month_complete: bool,
+) -> list[PlannedExpense]:
+    """Keep expense plans whose cash has not already left in a closed month."""
+    current = _key(as_of.year, as_of.month)
+    kept: list[PlannedExpense] = []
+    for expense in expenses:
+        key = _key(expense.year, expense.month)
+        if key < current or (key == current and month_complete):
+            continue
+        kept.append(expense)
+    return kept
+
+
+def _expense_amounts(expenses: list[PlannedExpense], key: tuple[int, int]) -> tuple[int, int]:
+    supply = 0
+    gross = 0
+    for expense in expenses:
+        if _key(expense.year, expense.month) != key:
+            continue
+        supply += expense.supply
+        gross += expense.gross
+    return supply, gross
 
 
 def _plan_amounts(plans: list[PlannedSale], key: tuple[int, int], already_sales: int) -> tuple[int, int]:

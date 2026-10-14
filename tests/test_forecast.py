@@ -5,7 +5,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
-from forecast import MonthActual, PlannedSale, apply_actual_balances, build_forecast, vat_due
+from forecast import (
+    MonthActual,
+    PlannedExpense,
+    PlannedSale,
+    apply_actual_balances,
+    build_forecast,
+    vat_due,
+)
 
 
 def month(year, month, sales=0, purchase=0, card=0, bank_in=0, bank_out=0, card_paid=0, vat_paid=0):
@@ -101,6 +108,30 @@ class ForecastTest(unittest.TestCase):
         october = next(row for row in forecast["rows"] if row["month"] == 10)
         self.assertEqual(october["bankOut"], 4_200_000)
         self.assertEqual(october["endCash"], 6_800_000)
+
+    def test_planned_expense_is_paid_with_vat_and_does_not_reduce_output_vat(self):
+        forecast = build_forecast(
+            [month(2026, 10)],
+            date(2026, 10, 12),
+            10_000_000,
+            [PlannedSale(2026, 11, 30, 1_000_000)],
+            expenses=[
+                PlannedExpense(2026, 9, 30, 5_000_000),
+                PlannedExpense(2026, 10, 20, 2_000_000),
+                PlannedExpense(2026, 12, 15, 1_000_000, "외주"),
+            ],
+        )
+        by = {(row["year"], row["month"]): row for row in forecast["rows"]}
+        self.assertEqual(by[(2026, 10)]["status"], "예정")
+        self.assertEqual(by[(2026, 10)]["purchase"], 2_000_000)
+        self.assertEqual(by[(2026, 10)]["bankOut"], 2_200_000)
+        self.assertEqual(by[(2026, 10)]["endCash"], 7_800_000)
+        self.assertEqual(by[(2026, 11)]["bankIn"], 1_100_000)
+        self.assertEqual(by[(2026, 12)]["status"], "예정")
+        self.assertEqual(by[(2026, 12)]["purchase"], 1_000_000)
+        self.assertEqual(by[(2026, 12)]["bankOut"], 1_100_000)
+        self.assertEqual(by[(2026, 12)]["endCash"], 7_800_000)
+        self.assertEqual(by[(2027, 1)]["bankOut"], 100_000)
 
 
 if __name__ == "__main__":
