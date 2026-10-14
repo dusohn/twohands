@@ -1,11 +1,7 @@
 const LOCAL = location.hostname === "localhost" || location.hostname === "127.0.0.1";
-const DATA_CANDIDATES = LOCAL
-  ? ["../data/cashflow.json", "./cashflow.json"]
-  : [
-      "https://raw.githubusercontent.com/dusohn/twohands/main/data/cashflow.json",
-      "../data/cashflow.json",
-      "./cashflow.json",
-    ];
+const LOCAL_DATA = ["../data/cashflow.json", "./cashflow.json"];
+const LOCAL_PLANS = ["../data/plans.json", "./plans.json"];
+let commitSha = null;
 
 const TABS = [
   ["dashboard", "Dashboard"],
@@ -516,6 +512,7 @@ async function pollSavedPlans(saved, generation) {
     await new Promise((resolve) => setTimeout(resolve, 5000));
     if (generation !== saveGeneration) return;
     try {
+      await refreshCommit();
       const plans = await loadPlans();
       if (!plans || !samePlans(plans.sales, saved.sales) || !samePlans(plans.expenses, saved.expenses)) continue;
       const fresh = await loadData();
@@ -539,19 +536,44 @@ async function pollSavedPlans(saved, generation) {
   if (status) status.textContent = state.saveMessage;
 }
 
-const PLAN_CANDIDATES = LOCAL
-  ? ["../data/plans.json", "./plans.json"]
-  : [
-      `https://raw.githubusercontent.com/${REPO}/main/data/plans.json`,
-      "../data/plans.json",
-      "./plans.json",
-    ];
+function remoteUrls(path) {
+  const urls = [];
+  if (commitSha) urls.push(`https://raw.githubusercontent.com/${REPO}/${commitSha}/${path}`);
+  urls.push(`https://api.github.com/repos/${REPO}/contents/${path}?ref=main`);
+  urls.push(`https://raw.githubusercontent.com/${REPO}/main/${path}`);
+  return urls;
+}
+
+async function latestSha() {
+  const response = await fetch(`https://api.github.com/repos/${REPO}/commits/main`, {
+    cache: "no-store",
+    headers: {
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+    },
+  });
+  if (!response.ok) return null;
+  const payload = await response.json();
+  return typeof payload.sha === "string" ? payload.sha : null;
+}
+
+async function refreshCommit() {
+  if (LOCAL) return;
+  try {
+    commitSha = await latestSha();
+  } catch (error) {
+    commitSha = null;
+  }
+}
 
 async function loadJson(candidates) {
   let lastError = null;
   for (const url of candidates) {
     try {
-      const response = await fetch(`${url}${url.includes("?") ? "&" : "?"}t=${Date.now()}`, { cache: "no-store" });
+      const headers = url.includes("api.github.com")
+        ? { Accept: "application/vnd.github.raw", "X-GitHub-Api-Version": "2022-11-28" }
+        : {};
+      const response = await fetch(url, { cache: "no-store", headers });
       if (!response.ok) continue;
       return await response.json();
     } catch (error) {
@@ -563,18 +585,21 @@ async function loadJson(candidates) {
 }
 
 async function loadData() {
-  return (await loadJson(DATA_CANDIDATES)) || Promise.reject(new Error("cashflow.json을 찾지 못했습니다"));
+  const urls = LOCAL ? LOCAL_DATA : remoteUrls("data/cashflow.json");
+  return (await loadJson(urls)) || Promise.reject(new Error("cashflow.json을 찾지 못했습니다"));
 }
 
 async function loadPlans() {
   try {
-    return await loadJson(PLAN_CANDIDATES);
+    const urls = LOCAL ? LOCAL_PLANS : remoteUrls("data/plans.json");
+    return await loadJson(urls);
   } catch (error) {
     return null;
   }
 }
 
-loadData()
+refreshCommit()
+  .then(() => loadData())
   .then(async (data) => {
     page = data;
     const plans = await loadPlans();
