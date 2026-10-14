@@ -125,6 +125,24 @@ function chartSvg(rows) {
   </svg>`;
 }
 
+function planForm(items, dateLabel) {
+  return (items || [])
+    .map((plan) => {
+      const vat = Math.round(Number(plan.supply) * 0.1);
+      const note = plan.note
+        ? `<div class="fld"><label>메모</label><input readonly value="${esc(plan.note)}"></div>`
+        : "";
+      return `<div class="form-grid">
+        <div class="fld"><label>${dateLabel}</label><input readonly value="${esc(plan.date)}"></div>
+        <div class="fld"><label>공급가(원)</label><input readonly value="${fmt(plan.supply)}"></div>
+        <div class="fld"><label>부가세(원)</label><input readonly value="${fmt(vat)}"></div>
+        <div class="fld"><label>총액(원)</label><input readonly value="${fmt(Number(plan.supply) + vat)}"></div>
+        ${note}
+      </div>`;
+    })
+    .join("");
+}
+
 function renderDashboard(data, rows) {
   const opening = rows.map((_, index) => openingCash(data, rows, index));
   const net = rows.map((row) => row.bankIn - row.bankOut);
@@ -135,17 +153,8 @@ function renderDashboard(data, rows) {
   const depletion = data.depletion
     ? `${data.depletion.year}년 ${data.depletion.month}월 ${data.depletion.day}일께`
     : "표시 기간 이후";
-  const plans = (data.plans || [])
-    .map((plan) => {
-      const vat = Math.round(plan.supply * 0.1);
-      return `<div class="form-grid">
-        <div class="fld"><label>입금 예정일</label><input readonly value="${esc(plan.date)}"></div>
-        <div class="fld"><label>공급가(원)</label><input readonly value="${fmt(plan.supply)}"></div>
-        <div class="fld"><label>부가세(원)</label><input readonly value="${fmt(vat)}"></div>
-        <div class="fld"><label>총액(원)</label><input readonly value="${fmt(plan.supply + vat)}"></div>
-      </div>`;
-    })
-    .join("");
+  const plans = planForm(data.plans, "입금 예정일");
+  const expenses = planForm(data.expenses, "출금 예정일");
   return `
     <div class="kpis">
       <div class="kpi"><div class="k">${esc(data.asOf)} 통장 잔고</div><div class="v">${fmt(data.cashNow)}원</div></div>
@@ -183,6 +192,11 @@ function renderDashboard(data, rows) {
       <p class="cf-note">금액은 공급가액입니다. 통장 입금은 부가세 10%를 더한 총액이고, 부가세는 1월·4월·7월·10월에 납부합니다.</p>
       ${plans || '<p class="empty">예정 매출이 없습니다.</p>'}
     </div>
+    <div class="cf-card">
+      <h2>예정 지출 <span class="file-tag">data/plans.json · expenses</span></h2>
+      <p class="cf-note">금액은 공급가액입니다. 그 달 통장 출금은 부가세 10%를 더한 총액입니다. 매입세액은 1·4·7·10월 납부액에서 빼지 않습니다. 이미 지난 달은 다시 반영하지 않습니다.</p>
+      ${expenses || '<p class="empty">예정 지출이 없습니다. expenses에 날짜와 공급가액을 넣으면 현금흐름에 반영됩니다.</p>'}
+    </div>
     <div class="cf-card"><h2>계산</h2>
       <ul class="assumptions">${(data.assumptions || []).map((item) => `<li>${esc(item)}</li>`).join("")}</ul>
       <p class="cf-note">월 지출 예상 ${fmt(data.baseExpense)}원.</p>
@@ -211,7 +225,7 @@ function renderCashflow(data, rows) {
   return `
     <div class="cf-card">
       <h2>Cashflow — 월별 현금흐름 12개월 전망</h2>
-      <p class="cf-note">자비스 원장과 예정 매출로 집계합니다. 지출은 음수로 표시합니다. 카드 대금은 사용 다음 달 통장 출금이고, 부가세는 1·4·7·10월 통장 출금에 포함됩니다. 매출·매입·카드는 발생 기준 참고 금액입니다.</p>
+      <p class="cf-note">자비스 원장, 예정 매출, 예정 지출로 집계합니다. 지출은 음수로 표시합니다. 카드 대금은 사용 다음 달 통장 출금이고, 매출 부가세는 1·4·7·10월 통장 출금에 포함됩니다. 예정 지출은 그 달 통장 출금에 공급가액과 부가세 10%가 함께 나갑니다. 매출·매입·카드는 발생 기준 참고 금액입니다.</p>
       <div class="tbl-wrap" style="max-height:72vh; overflow:auto;">
       <table class="cf">
         <tr><th class="sticky-col" style="z-index:2; text-align:center">구분</th>${rows
