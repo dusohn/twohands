@@ -161,8 +161,8 @@ function renderDashboard(data, rows) {
     </div>
     <div class="cf-card"><h2>월별 현금 잔액 요약</h2>
       <div class="tbl-wrap"><table class="cf">
-        <tr><th style="text-align:right">월</th><th class="num">기초현금</th><th class="num">수입</th><th class="num">지출</th>
-            <th class="num">순현금흐름</th><th class="num">기말현금</th><th style="text-align:center">상태</th></tr>
+        <tr><th>월</th><th class="num">기초현금</th><th class="num">수입</th><th class="num">지출</th>
+            <th class="num">순현금흐름</th><th class="num">기말현금</th><th>상태</th></tr>
         ${rows
           .map(
             (row, index) => `<tr>
@@ -215,8 +215,8 @@ function renderCashflow(data, rows) {
       <div class="tbl-wrap" style="max-height:72vh; overflow:auto;">
       <table class="cf">
         <tr><th class="sticky-col" style="z-index:2">구분</th>${rows
-          .map((row) => `<th class="num" style="text-align:center">${ym(row.year, row.month)}</th>`)
-          .join("")}<th class="num" style="text-align:center">합계</th></tr>
+          .map((row) => `<th class="num">${ym(row.year, row.month)}</th>`)
+          .join("")}<th class="num">합계</th></tr>
         ${matrixRow("기초 현금", opening, "row-sum")}
         ${section("영업 현금유입")}
         ${matrixRow("통장 입금", inflow)}

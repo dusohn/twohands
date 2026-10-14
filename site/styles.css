@@ -29,7 +29,7 @@ body{margin:0;}
 .tbl-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:8px;}
 table.cf{border-collapse:collapse; width:max-content; min-width:100%; font-size:13px;}
 table.cf th{background:#EDF1F7; color:var(--ink2); font-weight:700; font-size:12px; padding:7px 10px;
-  border-bottom:1px solid var(--line2); text-align:left; white-space:nowrap; position:sticky; top:0;}
+  border-bottom:1px solid var(--line2); text-align:right; white-space:nowrap; position:sticky; top:0;}
 table.cf td{padding:6px 10px; border-bottom:1px solid var(--line); white-space:nowrap; vertical-align:middle;}
 table.cf tr:last-child td{border-bottom:none;}
 td.num,th.num{text-align:right; font-variant-numeric:tabular-nums;}
