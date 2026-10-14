@@ -59,6 +59,11 @@ table.cf .row-sum td.sticky-col{background:#FBFCFE;} table.cf .row-final td.stic
 .chart-wrap{overflow-x:auto;}
 .file-tag{font-size:11px; color:var(--ink2); background:#EDF1F7; border-radius:5px; padding:2px 7px; font-family:var(--mono);}
 .empty{padding:30px; text-align:center; color:var(--ink2); font-size:13px;}
+.plan-actions{display:flex; gap:8px; flex-wrap:wrap; margin:4px 0 8px;}
+.save-status{margin:8px 0 0;}
+.save-status.ok{color:var(--in);}
+.save-status.err{color:var(--out);}
+.token-field{max-width:460px; margin-top:10px;}
 .assumptions{margin:0; padding-left:18px; color:var(--ink2); font-size:13px;}
 .assumptions li{margin:4px 0;}
 @media (max-width:820px){

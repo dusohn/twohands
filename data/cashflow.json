@@ -2,7 +2,7 @@
   "company": "주식회사 투핸즈",
   "source": "자비스",
   "asOf": "2026-10-13",
-  "updatedAt": "2026-10-14T13:49:57+09:00",
+  "updatedAt": "2026-10-14T15:11:08+09:00",
   "currency": "KRW",
   "cashNow": 33571393,
   "baseExpense": 3415585,
@@ -10,20 +10,162 @@
   "monthComplete": false,
   "depletion": {
     "year": 2029,
-    "month": 11,
-    "day": 9
+    "month": 10,
+    "day": 10
   },
   "plans": [
     {
       "date": "2026-11-30",
-      "supply": 56000000
+      "supply": 56000000,
+      "note": "부가세 별도, 월말 입금"
     },
     {
       "date": "2027-04-30",
-      "supply": 42000000
+      "supply": 42000000,
+      "note": "부가세 별도, 월말 입금"
     }
   ],
-  "expenses": [],
+  "expenses": [
+    {
+      "date": "2026-10-30",
+      "supply": 3000000,
+      "note": "침대구입"
+    }
+  ],
+  "actuals": [
+    {
+      "year": 2026,
+      "month": 1,
+      "sales": 0,
+      "purchase": 0,
+      "card": 0,
+      "bankIn": 0,
+      "bankOut": 0,
+      "cardPaid": 0,
+      "vatPaid": 0,
+      "endCash": 0
+    },
+    {
+      "year": 2026,
+      "month": 2,
+      "sales": 0,
+      "purchase": 0,
+      "card": 0,
+      "bankIn": 0,
+      "bankOut": 0,
+      "cardPaid": 0,
+      "vatPaid": 0,
+      "endCash": 0
+    },
+    {
+      "year": 2026,
+      "month": 3,
+      "sales": 0,
+      "purchase": 0,
+      "card": 0,
+      "bankIn": 0,
+      "bankOut": 0,
+      "cardPaid": 0,
+      "vatPaid": 0,
+      "endCash": 0
+    },
+    {
+      "year": 2026,
+      "month": 4,
+      "sales": 0,
+      "purchase": 0,
+      "card": 0,
+      "bankIn": 0,
+      "bankOut": 0,
+      "cardPaid": 0,
+      "vatPaid": 0,
+      "endCash": 0
+    },
+    {
+      "year": 2026,
+      "month": 5,
+      "sales": 0,
+      "purchase": 0,
+      "card": 0,
+      "bankIn": 0,
+      "bankOut": 0,
+      "cardPaid": 0,
+      "vatPaid": 0,
+      "endCash": 0
+    },
+    {
+      "year": 2026,
+      "month": 6,
+      "sales": 0,
+      "purchase": 0,
+      "card": 0,
+      "bankIn": 0,
+      "bankOut": 0,
+      "cardPaid": 0,
+      "vatPaid": 0,
+      "endCash": 0
+    },
+    {
+      "year": 2026,
+      "month": 7,
+      "sales": 0,
+      "purchase": 414600,
+      "card": 0,
+      "bankIn": 604101,
+      "bankOut": 179780,
+      "cardPaid": 161080,
+      "vatPaid": 0,
+      "endCash": 424321
+    },
+    {
+      "year": 2026,
+      "month": 8,
+      "sales": 42000000,
+      "purchase": 0,
+      "card": 7191225,
+      "bankIn": 46202125,
+      "bankOut": 5628584,
+      "cardPaid": 5628584,
+      "vatPaid": 0,
+      "endCash": 40997862
+    },
+    {
+      "year": 2026,
+      "month": 9,
+      "sales": 0,
+      "purchase": 0,
+      "card": 2949981,
+      "bankIn": 35948,
+      "bankOut": 7462417,
+      "cardPaid": 7456887,
+      "vatPaid": 0,
+      "endCash": 33571393
+    },
+    {
+      "year": 2026,
+      "month": 10,
+      "sales": 0,
+      "purchase": 0,
+      "card": 1627595,
+      "bankIn": 0,
+      "bankOut": 0,
+      "cardPaid": 0,
+      "vatPaid": 0,
+      "endCash": 33571393
+    }
+  ],
+  "balances": {
+    "2026-01": 0,
+    "2026-02": 0,
+    "2026-03": 0,
+    "2026-04": 0,
+    "2026-05": 0,
+    "2026-06": 0,
+    "2026-07": 424321,
+    "2026-08": 40997862,
+    "2026-09": 33571393,
+    "2026-10": 33571393
+  },
   "cardMixMonth": "2026-09",
   "cardMix": [
     {
@@ -68,7 +210,8 @@
     "이번 달 카드 지출은 자비스 지출 리포트의 경과일을 월말로 늘린 금액입니다.",
     "그 다음 달부터의 월 지출은 지난달 카드와 이번 달 예상 카드의 평균입니다.",
     "예정 매출의 통장 입금은 공급가액에 부가세 10%를 더한 금액입니다.",
-    "예정 지출의 통장 출금은 공급가액에 부가세 10%를 더한 금액입니다. data/plans.json의 expenses에서 수정합니다.",
+    "예정 지출의 통장 출금은 공급가액에 부가세 10%를 더한 금액입니다.",
+    "예정 매출과 예정 지출은 화면에서 저장하면 data/plans.json에 기록됩니다.",
     "매출 부가세는 1월, 4월, 7월, 10월에 납부합니다. 1–3월분은 4월, 4–6월분은 7월, 7–9월분은 10월, 10–12월분은 다음 해 1월입니다.",
     "매입세액 공제는 빼지 않습니다. 이미 통장에서 나간 부가세는 다시 빼지 않습니다.",
     "예금 이자는 예상하지 않습니다. 예정 매출 외에 미래 매출은 0원이고, 예정 지출 외에 미래 매입은 0원입니다."
@@ -176,13 +319,13 @@
     {
       "year": 2026,
       "month": 10,
-      "status": "진행",
+      "status": "예정",
       "sales": 0,
-      "purchase": 0,
+      "purchase": 3000000,
       "card": 3881188,
       "bankIn": 0,
-      "bankOut": 7149981,
-      "endCash": 26421412
+      "bankOut": 10449981,
+      "endCash": 23121412
     },
     {
       "year": 2026,
@@ -193,7 +336,7 @@
       "card": 3415585,
       "bankIn": 61600000,
       "bankOut": 3881188,
-      "endCash": 84140224
+      "endCash": 80840224
     },
     {
       "year": 2026,
@@ -204,7 +347,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 80724639
+      "endCash": 77424639
     },
     {
       "year": 2027,
@@ -215,7 +358,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 9015585,
-      "endCash": 71709054
+      "endCash": 68409054
     },
     {
       "year": 2027,
@@ -226,7 +369,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 68293469
+      "endCash": 64993469
     },
     {
       "year": 2027,
@@ -237,7 +380,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 64877884
+      "endCash": 61577884
     },
     {
       "year": 2027,
@@ -248,7 +391,7 @@
       "card": 3415585,
       "bankIn": 46200000,
       "bankOut": 3415585,
-      "endCash": 107662299
+      "endCash": 104362299
     },
     {
       "year": 2027,
@@ -259,7 +402,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 104246714
+      "endCash": 100946714
     },
     {
       "year": 2027,
@@ -270,7 +413,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 100831129
+      "endCash": 97531129
     },
     {
       "year": 2027,
@@ -281,7 +424,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 7615585,
-      "endCash": 93215544
+      "endCash": 89915544
     },
     {
       "year": 2027,
@@ -292,7 +435,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 89799959
+      "endCash": 86499959
     },
     {
       "year": 2027,
@@ -303,7 +446,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 86384374
+      "endCash": 83084374
     },
     {
       "year": 2027,
@@ -314,7 +457,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 82968789
+      "endCash": 79668789
     },
     {
       "year": 2027,
@@ -325,7 +468,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 79553204
+      "endCash": 76253204
     },
     {
       "year": 2027,
@@ -336,7 +479,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 76137619
+      "endCash": 72837619
     },
     {
       "year": 2028,
@@ -347,7 +490,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 72722034
+      "endCash": 69422034
     },
     {
       "year": 2028,
@@ -358,7 +501,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 69306449
+      "endCash": 66006449
     },
     {
       "year": 2028,
@@ -369,7 +512,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 65890864
+      "endCash": 62590864
     },
     {
       "year": 2028,
@@ -380,7 +523,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 62475279
+      "endCash": 59175279
     },
     {
       "year": 2028,
@@ -391,7 +534,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 59059694
+      "endCash": 55759694
     },
     {
       "year": 2028,
@@ -402,7 +545,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 55644109
+      "endCash": 52344109
     },
     {
       "year": 2028,
@@ -413,7 +556,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 52228524
+      "endCash": 48928524
     },
     {
       "year": 2028,
@@ -424,7 +567,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 48812939
+      "endCash": 45512939
     },
     {
       "year": 2028,
@@ -435,7 +578,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 45397354
+      "endCash": 42097354
     },
     {
       "year": 2028,
@@ -446,7 +589,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 41981769
+      "endCash": 38681769
     },
     {
       "year": 2028,
@@ -457,7 +600,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 38566184
+      "endCash": 35266184
     },
     {
       "year": 2028,
@@ -468,7 +611,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 35150599
+      "endCash": 31850599
     },
     {
       "year": 2029,
@@ -479,7 +622,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 31735014
+      "endCash": 28435014
     },
     {
       "year": 2029,
@@ -490,7 +633,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 28319429
+      "endCash": 25019429
     },
     {
       "year": 2029,
@@ -501,7 +644,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 24903844
+      "endCash": 21603844
     },
     {
       "year": 2029,
@@ -512,7 +655,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 21488259
+      "endCash": 18188259
     },
     {
       "year": 2029,
@@ -523,7 +666,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 18072674
+      "endCash": 14772674
     },
     {
       "year": 2029,
@@ -534,7 +677,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 14657089
+      "endCash": 11357089
     },
     {
       "year": 2029,
@@ -545,7 +688,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 11241504
+      "endCash": 7941504
     },
     {
       "year": 2029,
@@ -556,7 +699,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 7825919
+      "endCash": 4525919
     },
     {
       "year": 2029,
@@ -567,7 +710,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 4410334
+      "endCash": 1110334
     },
     {
       "year": 2029,
@@ -578,7 +721,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": 994749
+      "endCash": -2305251
     },
     {
       "year": 2029,
@@ -589,7 +732,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": -2420836
+      "endCash": -5720836
     },
     {
       "year": 2029,
@@ -600,7 +743,7 @@
       "card": 3415585,
       "bankIn": 0,
       "bankOut": 3415585,
-      "endCash": -5836421
+      "endCash": -9136421
     }
   ]
 }
