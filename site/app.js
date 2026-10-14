@@ -161,7 +161,7 @@ function renderDashboard(data, rows) {
     </div>
     <div class="cf-card"><h2>월별 현금 잔액 요약</h2>
       <div class="tbl-wrap"><table class="cf">
-        <tr><th style="text-align:center">월</th><th class="num">기초현금</th><th class="num">수입</th><th class="num">지출</th>
+        <tr><th style="text-align:right">월</th><th class="num">기초현금</th><th class="num">수입</th><th class="num">지출</th>
             <th class="num">순현금흐름</th><th class="num">기말현금</th><th style="text-align:center">상태</th></tr>
         ${rows
           .map(
