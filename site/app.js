@@ -19,9 +19,9 @@ const state = {
   year: null,
   sales: [],
   expenses: [],
-  githubToken: "",
   saveMessage: "",
   saveOk: false,
+  saveLink: "",
 };
 let page = null;
 let saveGeneration = 0;
@@ -173,8 +173,18 @@ function capturePlans() {
   if (!document.querySelector(".plan-row, [data-add]")) return;
   state.sales = readKind("sales");
   state.expenses = readKind("expenses");
-  const token = document.getElementById("githubToken");
-  if (token) state.githubToken = token.value;
+}
+
+function plansIssueUrl(saved) {
+  const body = [
+    "이 이슈를 제출하면 예정 매출·지출이 data/plans.json에 저장됩니다.",
+    "",
+    "```json",
+    JSON.stringify(saved, null, 2),
+    "```",
+  ].join("\n");
+  const params = new URLSearchParams({ title: "save-plans", body });
+  return `https://github.com/${REPO}/issues/new?${params}`;
 }
 
 function validDate(value) {
@@ -271,13 +281,9 @@ function renderDashboard(data, rows) {
       ${expenses}
       <div class="plan-save">
         <div class="btns"><button type="button" class="btn btn-p" id="savePlans">매출·지출을 plans.json에 저장</button></div>
-        ${
-          LOCAL
-            ? ""
-            : `<div class="fld token-field"><label>GitHub 토큰</label><input id="githubToken" type="password" autocomplete="off" value="${esc(state.githubToken)}" placeholder="이 탭에서만 사용합니다"></div>`
-        }
         <p class="cf-note save-status ${state.saveMessage ? (state.saveOk ? "ok" : "err") : ""}" id="saveStatus">${esc(state.saveMessage)}</p>
-        <p class="cf-note">${LOCAL ? "이 화면의 저장은 data/plans.json에 바로 기록하고 현금흐름을 다시 계산합니다." : "저장하면 main의 data/plans.json에 기록합니다. 토큰은 저장소에 올리지 않습니다. Actions 권한이 있으면 현금흐름 숫자도 다시 계산합니다."}</p>
+        ${state.saveLink ? `<p class="cf-note"><a href="${esc(state.saveLink)}" target="_blank" rel="noopener">GitHub에서 저장 이슈 열기</a></p>` : ""}
+        <p class="cf-note">${LOCAL ? "이 화면의 저장은 data/plans.json에 바로 기록하고 현금흐름을 다시 계산합니다." : "저장하면 GitHub 창이 열립니다. 그 창에서 Submit new issue를 누르면 Actions가 secret TWOHANDS_TOCKEN을 읽어 data/plans.json에 저장합니다."}</p>
       </div>
     </div>
     <div class="cf-card"><h2>계산</h2>
@@ -482,105 +488,55 @@ async function savePlans(data) {
     await savePlansGitHub(saved);
   } catch (error) {
     state.saveOk = false;
+    state.saveLink = "";
     state.saveMessage = error.message || "저장하지 못했습니다.";
     render(page || data);
   }
 }
 
 async function savePlansGitHub(saved) {
-  const token = state.githubToken.trim();
-  if (!token) throw new Error("GitHub 토큰을 입력하면 main의 plans.json에 저장합니다.");
-  const api = `https://api.github.com/repos/${REPO}/contents/data/plans.json`;
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    Accept: "application/vnd.github+json",
-    "Content-Type": "application/json",
-    "X-GitHub-Api-Version": "2022-11-28",
-  };
-  const current = await fetch(`${api}?ref=main`, { headers, cache: "no-store" });
-  if (!current.ok) throw new Error(await githubError(current));
-  const meta = await current.json();
-  const body = `${JSON.stringify(saved, null, 2)}\n`;
-  const previousText = base64ToUtf8(meta.content.replace(/\n/g, ""));
-  if (previousText === body) {
+  if (page && samePlans(page.plans, saved.sales) && samePlans(page.expenses, saved.expenses)) {
     state.saveOk = true;
+    state.saveLink = "";
     state.saveMessage = "plans.json과 같습니다.";
     applySaved(page, saved, null);
     return;
   }
-  const put = await fetch(api, {
-    method: "PUT",
-    headers,
-    body: JSON.stringify({
-      message: "화면에서 예정 매출·지출을 수정",
-      content: utf8ToBase64(body),
-      sha: meta.sha,
-      branch: "main",
-    }),
-  });
-  if (!put.ok) throw new Error(await githubError(put));
-  const previousUpdated = page && page.updatedAt;
-  const dispatched = await dispatchRefresh(headers);
+  const url = plansIssueUrl(saved);
+  const opened = window.open(url, "_blank", "noopener");
   state.saveOk = true;
-  state.saveMessage = dispatched
-    ? "plans.json에 저장했습니다. 현금흐름 숫자를 다시 계산하는 중입니다."
-    : "plans.json에 저장했습니다. 현금흐름 숫자는 다음 아침 갱신에 반영됩니다.";
+  state.saveLink = opened ? "" : url;
+  state.saveMessage = "열린 GitHub 창에서 Submit new issue를 누르면 secret TWOHANDS_TOCKEN으로 plans.json에 저장됩니다.";
   applySaved(page, saved, null);
-  if (dispatched) pollCashflow(saved, previousUpdated, ++saveGeneration);
+  pollSavedPlans(saved, ++saveGeneration);
 }
 
-async function dispatchRefresh(headers) {
-  const response = await fetch(
-    `https://api.github.com/repos/${REPO}/actions/workflows/refresh-cashflow.yml/dispatches`,
-    { method: "POST", headers, body: JSON.stringify({ ref: "main" }) }
-  );
-  return response.status === 204;
-}
-
-async function pollCashflow(saved, previousUpdated, generation) {
-  for (let attempt = 0; attempt < 12; attempt += 1) {
-    await new Promise((resolve) => setTimeout(resolve, 8000));
+async function pollSavedPlans(saved, generation) {
+  for (let attempt = 0; attempt < 24; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     if (generation !== saveGeneration) return;
     try {
-      const fresh = await loadJson(DATA_CANDIDATES);
-      if (!fresh || fresh.updatedAt === previousUpdated) continue;
-      if (!samePlans(fresh.plans, saved.sales) || !samePlans(fresh.expenses, saved.expenses)) continue;
+      const plans = await loadPlans();
+      if (!plans || !samePlans(plans.sales, saved.sales) || !samePlans(plans.expenses, saved.expenses)) continue;
+      const fresh = await loadData();
       if (generation !== saveGeneration) return;
+      const cashflowReady = fresh && samePlans(fresh.expenses, saved.expenses) && samePlans(fresh.plans, saved.sales);
+      state.saveLink = "";
       state.saveOk = true;
-      state.saveMessage = "plans.json에 저장하고 현금흐름을 다시 계산했습니다.";
-      applySaved(page, saved, fresh);
+      state.saveMessage = cashflowReady
+        ? "plans.json에 저장하고 현금흐름을 다시 계산했습니다."
+        : "plans.json에 저장했습니다. 현금흐름 숫자는 다음 아침 갱신에 반영됩니다.";
+      applySaved(page, saved, cashflowReady ? fresh : null);
       return;
     } catch (error) {
-      /* keep waiting for the refresh commit */
+      /* keep waiting for the Actions commit */
     }
   }
   if (generation !== saveGeneration) return;
   state.saveOk = true;
-  state.saveMessage = "plans.json에 저장했습니다. 현금흐름 숫자는 갱신이 끝나면 바뀝니다.";
+  state.saveMessage = "이슈를 제출하면 저장됩니다. 반영까지 조금 걸릴 수 있습니다.";
   const status = document.getElementById("saveStatus");
   if (status) status.textContent = state.saveMessage;
-}
-
-function utf8ToBase64(value) {
-  const bytes = new TextEncoder().encode(value);
-  let binary = "";
-  bytes.forEach((byte) => {
-    binary += String.fromCharCode(byte);
-  });
-  return btoa(binary);
-}
-
-function base64ToUtf8(value) {
-  const binary = atob(value);
-  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
-  return new TextDecoder().decode(bytes);
-}
-
-async function githubError(response) {
-  if (response.status === 401) return "GitHub 토큰이 맞지 않습니다.";
-  if (response.status === 403) return "토큰에 저장소 쓰기 권한이 없습니다.";
-  if (response.status === 404) return "plans.json을 찾지 못했습니다.";
-  return `GitHub 오류 ${response.status}`;
 }
 
 const PLAN_CANDIDATES = LOCAL

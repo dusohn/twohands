@@ -1,0 +1,103 @@
+name: 화면 예정 저장
+
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+    inputs:
+      plans:
+        description: plans.json 내용
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: save-plans
+  cancel-in-progress: false
+
+jobs:
+  save:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issues' &&
+       github.event.issue.title == 'save-plans' &&
+       github.event.issue.user.login == github.repository_owner)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require TWOHANDS_TOCKEN
+        env:
+          TWOHANDS_TOCKEN: ${{ secrets.TWOHANDS_TOCKEN }}
+        run: |
+          if [ -z "$TWOHANDS_TOCKEN" ]; then
+            echo "Repository secret TWOHANDS_TOCKEN is missing"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.TWOHANDS_TOCKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Write plans.json from the issue
+        if: github.event_name == 'issues'
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: python3 scripts/save_plans_from_issue.py
+
+      - name: Write plans.json from the workflow input
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          PLANS_JSON: ${{ inputs.plans }}
+        run: python3 scripts/save_plans_from_issue.py
+
+      - name: Commit plans and cashflow
+        run: |
+          git config user.name "dusohn"
+          git config user.email "53807087+dusohn@users.noreply.github.com"
+          git add data/plans.json data/cashflow.json
+          if git diff --cached --quiet; then
+            echo "plans unchanged"
+          else
+            git commit -m "화면에서 예정 매출·지출을 수정"
+            git push
+          fi
+
+      - name: Close the save issue
+        if: github.event_name == 'issues'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: >
+          gh issue close "${{ github.event.issue.number }}"
+          --comment "data/plans.json에 저장했습니다."
+
+      - name: Report a failed save
+        if: failure() && github.event_name == 'issues'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: >
+          gh issue comment "${{ github.event.issue.number }}"
+          --body "저장하지 못했습니다. 저장소 secret TWOHANDS_TOCKEN에 Contents 읽기 및 쓰기 권한이 있는 토큰이 있는지 확인해 주세요."
+
+  reject:
+    if: >
+      github.event_name == 'issues' &&
+      github.event.issue.title == 'save-plans' &&
+      github.event.issue.user.login != github.repository_owner
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close an unauthorized save
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: >
+          gh issue close "${{ github.event.issue.number }}"
+          --comment "예정 매출·지출 저장은 저장소 소유자만 할 수 있습니다."
