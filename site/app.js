@@ -132,18 +132,33 @@ function chartSvg(rows) {
   </svg>`;
 }
 
+function supplyDigits(value) {
+  return String(value ?? "").replace(/[^\d]/g, "");
+}
+
+function formatSupply(value) {
+  const digits = supplyDigits(value);
+  if (!digits) return "";
+  return fmt(Number(digits));
+}
+
+function supplyAmount(value) {
+  const digits = supplyDigits(value);
+  if (!digits) return 0;
+  const amount = Number(digits);
+  return Number.isFinite(amount) ? amount : 0;
+}
+
 function vatOf(supply) {
-  const amount = Number(supply);
-  if (!Number.isFinite(amount)) return 0;
-  return Math.round(amount * 0.1);
+  return Math.round(supplyAmount(supply) * 0.1);
 }
 
 function planRow(kind, plan, dateLabel) {
-  const supply = Number(plan.supply) || 0;
+  const supply = supplyAmount(plan.supply);
   const vat = vatOf(supply);
   return `<div class="form-grid plan-row" data-kind="${kind}">
     <div class="fld"><label>${dateLabel}</label><input type="date" data-field="date" value="${esc(plan.date || "")}"></div>
-    <div class="fld"><label>공급가(원)</label><input data-field="supply" inputmode="numeric" value="${esc(plan.supply ?? "")}"></div>
+    <div class="fld"><label>공급가(원)</label><input data-field="supply" inputmode="numeric" value="${esc(formatSupply(plan.supply))}"></div>
     <div class="fld"><label>부가세(원)</label><input data-field="vat" readonly value="${fmt(vat)}"></div>
     <div class="fld"><label>총액(원)</label><input data-field="gross" readonly value="${fmt(supply + vat)}"></div>
     <div class="fld"><label>메모</label><input data-field="note" maxlength="80" value="${esc(plan.note || "")}"></div>
@@ -425,7 +440,25 @@ function bindPlanEditor(data) {
   body.addEventListener("input", (event) => {
     const row = event.target.closest(".plan-row");
     if (!row || event.target.dataset.field !== "supply") return;
-    const supply = Number(String(event.target.value).replace(/[,\s]/g, "")) || 0;
+    const input = event.target;
+    const cursor = input.selectionStart ?? input.value.length;
+    const digitsBefore = supplyDigits(input.value.slice(0, cursor)).length;
+    const formatted = formatSupply(input.value);
+    input.value = formatted;
+    let next = formatted.length;
+    if (digitsBefore === 0) next = 0;
+    else {
+      let seen = 0;
+      for (let index = 0; index < formatted.length; index += 1) {
+        if (/\d/.test(formatted[index])) seen += 1;
+        if (seen === digitsBefore) {
+          next = index + 1;
+          break;
+        }
+      }
+    }
+    input.setSelectionRange(next, next);
+    const supply = supplyAmount(formatted);
     const vat = vatOf(supply);
     row.querySelector('[data-field="vat"]').value = fmt(vat);
     row.querySelector('[data-field="gross"]').value = fmt(supply + vat);
