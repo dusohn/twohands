@@ -216,7 +216,7 @@ function renderCashflow(data, rows) {
       <table class="cf">
         <tr><th class="sticky-col" style="z-index:2">구분</th>${rows
           .map((row) => `<th class="num">${ym(row.year, row.month)}</th>`)
-          .join("")}<th class="num">합계</th></tr>
+          .join("")}<th class="num" style="text-align:center">합계</th></tr>
         ${matrixRow("기초 현금", opening, "row-sum")}
         ${section("영업 현금유입")}
         ${matrixRow("통장 입금", inflow)}
