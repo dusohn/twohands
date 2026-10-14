@@ -157,11 +157,11 @@ function planRow(kind, plan, dateLabel) {
   const supply = supplyAmount(plan.supply);
   const vat = vatOf(supply);
   return `<div class="form-grid plan-row" data-kind="${kind}">
-    <div class="fld"><label>${dateLabel}</label><input type="date" data-field="date" value="${esc(plan.date || "")}"></div>
-    <div class="fld"><label>공급가(원)</label><input data-field="supply" inputmode="numeric" value="${esc(formatSupply(plan.supply))}"></div>
-    <div class="fld"><label>부가세(원)</label><input data-field="vat" readonly value="${fmt(vat)}"></div>
-    <div class="fld"><label>총액(원)</label><input data-field="gross" readonly value="${fmt(supply + vat)}"></div>
-    <div class="fld"><label>메모</label><input data-field="note" maxlength="80" value="${esc(plan.note || "")}"></div>
+    <div class="fld fld-date"><label>${dateLabel}</label><input type="date" data-field="date" value="${esc(plan.date || "")}"></div>
+    <div class="fld fld-money"><label>공급가(원)</label><input data-field="supply" inputmode="numeric" value="${esc(formatSupply(plan.supply))}"></div>
+    <div class="fld fld-money"><label>부가세(원)</label><input data-field="vat" readonly value="${fmt(vat)}"></div>
+    <div class="fld fld-money"><label>총액(원)</label><input data-field="gross" readonly value="${fmt(supply + vat)}"></div>
+    <div class="fld fld-note"><label>메모</label><input data-field="note" maxlength="80" value="${esc(plan.note || "")}"></div>
     <div class="fld"><label>&nbsp;</label><button type="button" class="btn btn-g" data-remove>삭제</button></div>
   </div>`;
 }

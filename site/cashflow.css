@@ -49,6 +49,11 @@ table.cf .row-sum td.sticky-col{background:#FBFCFE;} table.cf .row-final td.stic
 .fld label{display:block; font-size:11.5px; color:var(--ink2); font-weight:700; margin-bottom:3px;}
 .fld input,.fld select,.fld textarea{width:100%; padding:7px 9px; border:1px solid var(--line2); border-radius:7px;
   font-size:13px; font-family:inherit; background:#fff; color:var(--ink);}
+.fld-date label,.fld-note label{text-align:center;}
+.fld-date input{text-align:center;}
+.fld-date input::-webkit-datetime-edit{text-align:center; width:100%;}
+.fld-date input::-webkit-datetime-edit-fields-wrapper{display:flex; justify-content:center; width:100%;}
+.fld-money label,.fld-money input{text-align:right; font-variant-numeric:tabular-nums;}
 .fld input:focus,.fld select:focus{outline:2px solid var(--accent); outline-offset:-1px; border-color:var(--accent);}
 .fld input[readonly]{background:#F2F4F8; color:var(--ink2);}
 .btns{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
