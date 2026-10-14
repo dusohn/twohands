@@ -214,7 +214,7 @@ function renderCashflow(data, rows) {
       <p class="cf-note">자비스 원장과 예정 매출로 집계합니다. 지출은 음수로 표시합니다. 카드 대금은 사용 다음 달 통장 출금이고, 부가세는 1·4·7·10월 통장 출금에 포함됩니다. 매출·매입·카드는 발생 기준 참고 금액입니다.</p>
       <div class="tbl-wrap" style="max-height:72vh; overflow:auto;">
       <table class="cf">
-        <tr><th class="sticky-col" style="z-index:2">구분</th>${rows
+        <tr><th class="sticky-col" style="z-index:2; text-align:center">구분</th>${rows
           .map((row) => `<th class="num">${ym(row.year, row.month)}</th>`)
           .join("")}<th class="num" style="text-align:center">합계</th></tr>
         ${matrixRow("기초 현금", opening, "row-sum")}
