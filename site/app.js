@@ -13,7 +13,18 @@ const TABS = [
   ["cards", "Cards"],
 ];
 
-const state = { tab: "dashboard", year: null };
+const REPO = "dusohn/twohands";
+const state = {
+  tab: "dashboard",
+  year: null,
+  sales: [],
+  expenses: [],
+  githubToken: "",
+  saveMessage: "",
+  saveOk: false,
+};
+let page = null;
+let saveGeneration = 0;
 
 function fmt(n) {
   if (n === null || n === undefined || Number.isNaN(n)) return "";
@@ -125,22 +136,84 @@ function chartSvg(rows) {
   </svg>`;
 }
 
-function planForm(items, dateLabel) {
-  return (items || [])
-    .map((plan) => {
-      const vat = Math.round(Number(plan.supply) * 0.1);
-      const note = plan.note
-        ? `<div class="fld"><label>메모</label><input readonly value="${esc(plan.note)}"></div>`
-        : "";
-      return `<div class="form-grid">
-        <div class="fld"><label>${dateLabel}</label><input readonly value="${esc(plan.date)}"></div>
-        <div class="fld"><label>공급가(원)</label><input readonly value="${fmt(plan.supply)}"></div>
-        <div class="fld"><label>부가세(원)</label><input readonly value="${fmt(vat)}"></div>
-        <div class="fld"><label>총액(원)</label><input readonly value="${fmt(Number(plan.supply) + vat)}"></div>
-        ${note}
-      </div>`;
-    })
-    .join("");
+function vatOf(supply) {
+  const amount = Number(supply);
+  if (!Number.isFinite(amount)) return 0;
+  return Math.round(amount * 0.1);
+}
+
+function planRow(kind, plan, dateLabel) {
+  const supply = Number(plan.supply) || 0;
+  const vat = vatOf(supply);
+  return `<div class="form-grid plan-row" data-kind="${kind}">
+    <div class="fld"><label>${dateLabel}</label><input type="date" data-field="date" value="${esc(plan.date || "")}"></div>
+    <div class="fld"><label>공급가(원)</label><input data-field="supply" inputmode="numeric" value="${esc(plan.supply ?? "")}"></div>
+    <div class="fld"><label>부가세(원)</label><input data-field="vat" readonly value="${fmt(vat)}"></div>
+    <div class="fld"><label>총액(원)</label><input data-field="gross" readonly value="${fmt(supply + vat)}"></div>
+    <div class="fld"><label>메모</label><input data-field="note" maxlength="80" value="${esc(plan.note || "")}"></div>
+    <div class="fld"><label>&nbsp;</label><button type="button" class="btn btn-g" data-remove>삭제</button></div>
+  </div>`;
+}
+
+function planEditor(kind, items, dateLabel, addLabel) {
+  const rows = (items || []).map((plan) => planRow(kind, plan, dateLabel)).join("");
+  return `${rows || '<p class="cf-note">입력된 항목이 없습니다.</p>'}
+    <div class="plan-actions"><button type="button" class="btn btn-g" data-add="${kind}">${addLabel}</button></div>`;
+}
+
+function readKind(kind) {
+  return [...document.querySelectorAll(`.plan-row[data-kind="${kind}"]`)].map((row) => ({
+    date: row.querySelector('[data-field="date"]').value,
+    supply: row.querySelector('[data-field="supply"]').value,
+    note: row.querySelector('[data-field="note"]').value,
+  }));
+}
+
+function capturePlans() {
+  if (!document.querySelector(".plan-row, [data-add]")) return;
+  state.sales = readKind("sales");
+  state.expenses = readKind("expenses");
+  const token = document.getElementById("githubToken");
+  if (token) state.githubToken = token.value;
+}
+
+function validDate(value) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return false;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+}
+
+function normalizeList(items) {
+  const rows = [];
+  for (const item of items) {
+    const date = String(item.date || "").trim();
+    const note = String(item.note || "").trim();
+    const supplyText = String(item.supply ?? "").replace(/[,\s]/g, "");
+    if (!date && !note && !supplyText) continue;
+    if (!validDate(date)) throw new Error("날짜는 YYYY-MM-DD로 입력합니다.");
+    if (!/^\d+$/.test(supplyText) || Number(supplyText) <= 0) {
+      throw new Error("공급가액은 0보다 큰 정수로 입력합니다.");
+    }
+    if (note.length > 80) throw new Error("메모는 80자까지 입력합니다.");
+    const row = { date, supply: Number(supplyText) };
+    if (note) row.note = note;
+    rows.push(row);
+  }
+  if (rows.length > 50) throw new Error("항목은 50개까지 입력합니다.");
+  rows.sort((a, b) => a.date.localeCompare(b.date) || a.supply - b.supply || (a.note || "").localeCompare(b.note || ""));
+  return rows;
+}
+
+function plansDocument() {
+  return { sales: normalizeList(state.sales), expenses: normalizeList(state.expenses) };
+}
+
+function samePlans(left, right) {
+  return JSON.stringify(normalizeList(left || [])) === JSON.stringify(normalizeList(right || []));
 }
 
 function renderDashboard(data, rows) {
@@ -153,8 +226,8 @@ function renderDashboard(data, rows) {
   const depletion = data.depletion
     ? `${data.depletion.year}년 ${data.depletion.month}월 ${data.depletion.day}일께`
     : "표시 기간 이후";
-  const plans = planForm(data.plans, "입금 예정일");
-  const expenses = planForm(data.expenses, "출금 예정일");
+  const plans = planEditor("sales", state.sales, "입금 예정일", "매출 추가");
+  const expenses = planEditor("expenses", state.expenses, "출금 예정일", "지출 추가");
   return `
     <div class="kpis">
       <div class="kpi"><div class="k">${esc(data.asOf)} 통장 잔고</div><div class="v">${fmt(data.cashNow)}원</div></div>
@@ -187,15 +260,25 @@ function renderDashboard(data, rows) {
           .join("")}
       </table></div>
     </div>
-    <div class="cf-card">
-      <h2>예정 매출 <span class="file-tag">data/plans.json</span></h2>
+    <div class="cf-card" id="planEditor">
+      <h2>예정 매출 <span class="file-tag">data/plans.json · sales</span></h2>
       <p class="cf-note">금액은 공급가액입니다. 통장 입금은 부가세 10%를 더한 총액이고, 부가세는 1월·4월·7월·10월에 납부합니다.</p>
-      ${plans || '<p class="empty">예정 매출이 없습니다.</p>'}
+      ${plans}
     </div>
     <div class="cf-card">
       <h2>예정 지출 <span class="file-tag">data/plans.json · expenses</span></h2>
       <p class="cf-note">금액은 공급가액입니다. 그 달 통장 출금은 부가세 10%를 더한 총액입니다. 매입세액은 1·4·7·10월 납부액에서 빼지 않습니다. 이미 지난 달은 다시 반영하지 않습니다.</p>
-      ${expenses || '<p class="empty">예정 지출이 없습니다. expenses에 날짜와 공급가액을 넣으면 현금흐름에 반영됩니다.</p>'}
+      ${expenses}
+      <div class="plan-save">
+        <div class="btns"><button type="button" class="btn btn-p" id="savePlans">매출·지출을 plans.json에 저장</button></div>
+        ${
+          LOCAL
+            ? ""
+            : `<div class="fld token-field"><label>GitHub 토큰</label><input id="githubToken" type="password" autocomplete="off" value="${esc(state.githubToken)}" placeholder="이 탭에서만 사용합니다"></div>`
+        }
+        <p class="cf-note save-status ${state.saveMessage ? (state.saveOk ? "ok" : "err") : ""}" id="saveStatus">${esc(state.saveMessage)}</p>
+        <p class="cf-note">${LOCAL ? "이 화면의 저장은 data/plans.json에 바로 기록하고 현금흐름을 다시 계산합니다." : "저장하면 main의 data/plans.json에 기록합니다. 토큰은 저장소에 올리지 않습니다. Actions 권한이 있으면 현금흐름 숫자도 다시 계산합니다."}</p>
+      </div>
     </div>
     <div class="cf-card"><h2>계산</h2>
       <ul class="assumptions">${(data.assumptions || []).map((item) => `<li>${esc(item)}</li>`).join("")}</ul>
@@ -225,7 +308,7 @@ function renderCashflow(data, rows) {
   return `
     <div class="cf-card">
       <h2>Cashflow — 월별 현금흐름 12개월 전망</h2>
-      <p class="cf-note">자비스 원장, 예정 매출, 예정 지출로 집계합니다. 지출은 음수로 표시합니다. 카드 대금은 사용 다음 달 통장 출금이고, 매출 부가세는 1·4·7·10월 통장 출금에 포함됩니다. 예정 지출은 그 달 통장 출금에 공급가액과 부가세 10%가 함께 나갑니다. 매출·매입·카드는 발생 기준 참고 금액입니다.</p>
+      <p class="cf-note">자비스 원장과 화면에서 저장한 예정 매출, 예정 지출로 집계합니다. 지출은 음수로 표시합니다. 카드 대금은 사용 다음 달 통장 출금이고, 매출 부가세는 1·4·7·10월 통장 출금에 포함됩니다. 예정 지출은 그 달 통장 출금에 공급가액과 부가세 10%가 함께 나갑니다. 매출·매입·카드는 발생 기준 참고 금액입니다.</p>
       <div class="tbl-wrap" style="max-height:72vh; overflow:auto;">
       <table class="cf">
         <tr><th class="sticky-col" style="z-index:2; text-align:center">구분</th>${rows
@@ -292,6 +375,7 @@ function render(data) {
     <div class="cf-body" id="tabBody"></div>`;
   root.querySelectorAll(".cf-tab").forEach((button) => {
     button.onclick = () => {
+      capturePlans();
       state.tab = button.dataset.tab;
       render(data);
     };
@@ -307,28 +391,245 @@ function render(data) {
   body.innerHTML = yearButtons(years) + view;
   body.querySelectorAll("[data-year]").forEach((button) => {
     button.onclick = () => {
+      capturePlans();
       state.year = Number(button.dataset.year);
       render(data);
     };
   });
+  bindPlanEditor(data);
 }
 
-async function loadData() {
-  let lastError = null;
-  for (const url of DATA_CANDIDATES) {
+function bindPlanEditor(data) {
+  const body = document.getElementById("tabBody");
+  if (!body) return;
+  body.querySelectorAll("[data-add]").forEach((button) => {
+    button.onclick = () => {
+      capturePlans();
+      const kind = button.dataset.add;
+      state[kind].push({ date: "", supply: "", note: "" });
+      render(data);
+    };
+  });
+  body.querySelectorAll("[data-remove]").forEach((button) => {
+    button.onclick = () => {
+      const row = button.closest(".plan-row");
+      const kind = row.dataset.kind;
+      const index = [...document.querySelectorAll(`.plan-row[data-kind="${kind}"]`)].indexOf(row);
+      capturePlans();
+      state[kind].splice(index, 1);
+      render(data);
+    };
+  });
+  body.addEventListener("input", (event) => {
+    const row = event.target.closest(".plan-row");
+    if (!row || event.target.dataset.field !== "supply") return;
+    const supply = Number(String(event.target.value).replace(/[,\s]/g, "")) || 0;
+    const vat = vatOf(supply);
+    row.querySelector('[data-field="vat"]').value = fmt(vat);
+    row.querySelector('[data-field="gross"]').value = fmt(supply + vat);
+  });
+  const save = document.getElementById("savePlans");
+  if (save) save.onclick = () => savePlans(data);
+}
+
+function applySaved(data, saved, cashflow) {
+  state.sales = saved.sales.map((row) => ({ ...row }));
+  state.expenses = saved.expenses.map((row) => ({ ...row }));
+  if (cashflow) {
+    page = cashflow;
+    page.plans = saved.sales;
+    page.expenses = saved.expenses;
+  } else if (page) {
+    page.plans = saved.sales;
+    page.expenses = saved.expenses;
+  }
+  render(page || data);
+}
+
+async function savePlans(data) {
+  capturePlans();
+  const button = document.getElementById("savePlans");
+  let saved;
+  try {
+    saved = plansDocument();
+  } catch (error) {
+    state.saveOk = false;
+    state.saveMessage = error.message;
+    render(data);
+    return;
+  }
+  if (button) button.disabled = true;
+  state.saveMessage = "저장하는 중입니다.";
+  state.saveOk = true;
+  const status = document.getElementById("saveStatus");
+  if (status) status.textContent = state.saveMessage;
+  try {
+    if (LOCAL) {
+      const response = await fetch("/api/plans", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(saved),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "저장하지 못했습니다.");
+      state.saveOk = true;
+      state.saveMessage = payload.cashflow
+        ? "plans.json에 저장하고 현금흐름을 다시 계산했습니다."
+        : "plans.json에 저장했습니다. 현금흐름 숫자는 다음 자비스 갱신에 반영됩니다.";
+      applySaved(data, payload.plans, payload.cashflow);
+      return;
+    }
+    await savePlansGitHub(saved);
+  } catch (error) {
+    state.saveOk = false;
+    state.saveMessage = error.message || "저장하지 못했습니다.";
+    render(page || data);
+  }
+}
+
+async function savePlansGitHub(saved) {
+  const token = state.githubToken.trim();
+  if (!token) throw new Error("GitHub 토큰을 입력하면 main의 plans.json에 저장합니다.");
+  const api = `https://api.github.com/repos/${REPO}/contents/data/plans.json`;
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    Accept: "application/vnd.github+json",
+    "Content-Type": "application/json",
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+  const current = await fetch(`${api}?ref=main`, { headers, cache: "no-store" });
+  if (!current.ok) throw new Error(await githubError(current));
+  const meta = await current.json();
+  const body = `${JSON.stringify(saved, null, 2)}\n`;
+  const previousText = base64ToUtf8(meta.content.replace(/\n/g, ""));
+  if (previousText === body) {
+    state.saveOk = true;
+    state.saveMessage = "plans.json과 같습니다.";
+    applySaved(page, saved, null);
+    return;
+  }
+  const put = await fetch(api, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({
+      message: "화면에서 예정 매출·지출을 수정",
+      content: utf8ToBase64(body),
+      sha: meta.sha,
+      branch: "main",
+    }),
+  });
+  if (!put.ok) throw new Error(await githubError(put));
+  const previousUpdated = page && page.updatedAt;
+  const dispatched = await dispatchRefresh(headers);
+  state.saveOk = true;
+  state.saveMessage = dispatched
+    ? "plans.json에 저장했습니다. 현금흐름 숫자를 다시 계산하는 중입니다."
+    : "plans.json에 저장했습니다. 현금흐름 숫자는 다음 아침 갱신에 반영됩니다.";
+  applySaved(page, saved, null);
+  if (dispatched) pollCashflow(saved, previousUpdated, ++saveGeneration);
+}
+
+async function dispatchRefresh(headers) {
+  const response = await fetch(
+    `https://api.github.com/repos/${REPO}/actions/workflows/refresh-cashflow.yml/dispatches`,
+    { method: "POST", headers, body: JSON.stringify({ ref: "main" }) }
+  );
+  return response.status === 204;
+}
+
+async function pollCashflow(saved, previousUpdated, generation) {
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 8000));
+    if (generation !== saveGeneration) return;
     try {
-      const response = await fetch(url, { cache: "no-store" });
+      const fresh = await loadJson(DATA_CANDIDATES);
+      if (!fresh || fresh.updatedAt === previousUpdated) continue;
+      if (!samePlans(fresh.plans, saved.sales) || !samePlans(fresh.expenses, saved.expenses)) continue;
+      if (generation !== saveGeneration) return;
+      state.saveOk = true;
+      state.saveMessage = "plans.json에 저장하고 현금흐름을 다시 계산했습니다.";
+      applySaved(page, saved, fresh);
+      return;
+    } catch (error) {
+      /* keep waiting for the refresh commit */
+    }
+  }
+  if (generation !== saveGeneration) return;
+  state.saveOk = true;
+  state.saveMessage = "plans.json에 저장했습니다. 현금흐름 숫자는 갱신이 끝나면 바뀝니다.";
+  const status = document.getElementById("saveStatus");
+  if (status) status.textContent = state.saveMessage;
+}
+
+function utf8ToBase64(value) {
+  const bytes = new TextEncoder().encode(value);
+  let binary = "";
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+  return btoa(binary);
+}
+
+function base64ToUtf8(value) {
+  const binary = atob(value);
+  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+
+async function githubError(response) {
+  if (response.status === 401) return "GitHub 토큰이 맞지 않습니다.";
+  if (response.status === 403) return "토큰에 저장소 쓰기 권한이 없습니다.";
+  if (response.status === 404) return "plans.json을 찾지 못했습니다.";
+  return `GitHub 오류 ${response.status}`;
+}
+
+const PLAN_CANDIDATES = LOCAL
+  ? ["../data/plans.json", "./plans.json"]
+  : [
+      `https://raw.githubusercontent.com/${REPO}/main/data/plans.json`,
+      "../data/plans.json",
+      "./plans.json",
+    ];
+
+async function loadJson(candidates) {
+  let lastError = null;
+  for (const url of candidates) {
+    try {
+      const response = await fetch(`${url}${url.includes("?") ? "&" : "?"}t=${Date.now()}`, { cache: "no-store" });
       if (!response.ok) continue;
       return await response.json();
     } catch (error) {
       lastError = error;
     }
   }
-  throw lastError || new Error("cashflow.json을 찾지 못했습니다");
+  if (lastError) throw lastError;
+  return null;
+}
+
+async function loadData() {
+  return (await loadJson(DATA_CANDIDATES)) || Promise.reject(new Error("cashflow.json을 찾지 못했습니다"));
+}
+
+async function loadPlans() {
+  try {
+    return await loadJson(PLAN_CANDIDATES);
+  } catch (error) {
+    return null;
+  }
 }
 
 loadData()
-  .then(render)
+  .then(async (data) => {
+    page = data;
+    const plans = await loadPlans();
+    state.sales = ((plans && plans.sales) || data.plans || []).map((row) => ({ ...row }));
+    state.expenses = ((plans && plans.expenses) || data.expenses || []).map((row) => ({ ...row }));
+    if (plans) {
+      page.plans = plans.sales || [];
+      page.expenses = plans.expenses || [];
+    }
+    render(page);
+  })
   .catch((error) => {
     document.getElementById("cfApp").innerHTML = `<p class="empty">숫자를 불러오지 못했습니다. ${esc(error.message)}</p>`;
   });
