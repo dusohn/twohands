@@ -53,7 +53,8 @@ table.cf .row-sum td.sticky-col{background:#FBFCFE;} table.cf .row-final td.stic
 .fld-date input{text-align:center;}
 .fld-date input::-webkit-datetime-edit{text-align:center; width:100%;}
 .fld-date input::-webkit-datetime-edit-fields-wrapper{display:flex; justify-content:center; width:100%;}
-.fld-money label,.fld-money input{text-align:right; font-variant-numeric:tabular-nums;}
+.fld-money label{text-align:center;}
+.fld-money input{text-align:right; font-variant-numeric:tabular-nums;}
 .fld input:focus,.fld select:focus{outline:2px solid var(--accent); outline-offset:-1px; border-color:var(--accent);}
 .fld input[readonly]{background:#F2F4F8; color:var(--ink2);}
 .btns{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
