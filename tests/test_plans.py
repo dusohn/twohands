@@ -5,6 +5,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
 from refresh_jobis import forecast_document, normalize_plans
+from save_plans_from_issue import extract_plans
 
 
 class PlansTest(unittest.TestCase):
@@ -25,6 +26,15 @@ class PlansTest(unittest.TestCase):
     def test_normalize_rejects_a_partial_row(self):
         with self.assertRaises(ValueError):
             normalize_plans({"sales": [{"date": "2026-11-30", "supply": ""}], "expenses": []})
+
+    def test_extract_plans_reads_the_json_fence(self):
+        payload = extract_plans(
+            "이 이슈를 제출하면 저장됩니다.\n\n```json\n"
+            '{"sales": [], "expenses": [{"date": "2026-12-25", "supply": 1800000, "note": "현탁 핸드폰"}]}\n'
+            "```\n"
+        )
+        self.assertEqual(payload["expenses"][0]["note"], "현탁 핸드폰")
+        self.assertEqual(payload["expenses"][0]["supply"], 1800000)
 
     def test_saved_expense_is_paid_with_vat(self):
         cash = {
