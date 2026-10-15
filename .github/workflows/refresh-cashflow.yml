@@ -4,6 +4,8 @@ on:
   schedule:
     # 07:00 Asia/Seoul. GitHub schedules this in UTC and may start a few minutes late.
     - cron: "0 22 * * *"
+    - cron: "0 7 * * *"
+    - cron: "50 * * * *"
   workflow_dispatch:
 
 permissions:
