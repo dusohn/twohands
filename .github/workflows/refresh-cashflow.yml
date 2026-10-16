@@ -1,9 +1,6 @@
 name: 자비스 현금흐름 갱신
 
 on:
-  schedule:
-    # 07:17 Asia/Seoul. Minute 0 is GitHub's busiest schedule slot and runs hours late.
-    - cron: "17 22 * * *"
   workflow_dispatch:
 
 permissions:
