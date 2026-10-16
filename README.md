@@ -12,7 +12,7 @@
 
 ## 매일 07:00 갱신
 
-`.github/workflows/refresh-cashflow.yml`이 한국시간 07:00(UTC 22:00)에 자비스에 로그인해서 `data/cashflow.json`을 다시 씁니다. 이 일정은 기본 브랜치에 워크플로가 있어야 실행됩니다.
+`.github/workflows/refresh-cashflow.yml`이 한국시간 07:17(UTC 22:17)에 자비스에 로그인해서 `data/cashflow.json`을 다시 씁니다. GitHub 예약은 매시 정각에 몰리면 실행 생성이 몇 시간 늦어지므로 17분에 둡니다. 이 일정은 기본 브랜치에 워크플로가 있어야 실행됩니다.
 
 저장소 Actions 비밀에 다음 두 값을 넣어야 합니다.
 
