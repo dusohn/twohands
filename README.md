@@ -12,7 +12,26 @@
 
 ## 매일 07:00 갱신
 
-`.github/workflows/refresh-cashflow.yml`이 한국시간 07:00(UTC 22:00)에 자비스에 로그인해서 `data/cashflow.json`을 다시 씁니다. 이 일정은 기본 브랜치에 워크플로가 있어야 실행됩니다.
+GitHub Actions에는 예약이 없습니다. grok-bot이 한국시간 07:00에 `refresh-cashflow.yml`을 `workflow_dispatch`로 실행합니다. 그 워크플로가 자비스에 로그인해서 `data/cashflow.json`을 다시 씁니다. 워크플로 파일은 기본 브랜치에 있어야 합니다.
+
+grok-bot 스케줄은 UTC `0 22 * * *`입니다. 봇의 GitHub 연결에 Actions 쓰기 권한이 있어야 합니다.
+
+```ts
+import { defineSchedule } from "@cursor/bdk/schedules";
+
+export default defineSchedule({
+  cron: "0 22 * * *",
+  async run({ host }) {
+    const octokit = await host.github.getOctokit();
+    await octokit.rest.actions.createWorkflowDispatch({
+      owner: "dusohn",
+      repo: "twohands",
+      workflow_id: "refresh-cashflow.yml",
+      ref: "main",
+    });
+  },
+});
+```
 
 저장소 Actions 비밀에 다음 두 값을 넣어야 합니다.
 

@@ -1,11 +1,6 @@
 name: 자비스 현금흐름 갱신
 
 on:
-  schedule:
-    # 07:00 Asia/Seoul. GitHub schedules this in UTC and may start a few minutes late.
-    - cron: "00 18 * * *"
-    - cron: "00 2 * * *"
-    - cron: "00 10 * * *"
   workflow_dispatch:
 
 permissions:
