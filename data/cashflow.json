@@ -1,17 +1,17 @@
 {
   "company": "주식회사 투핸즈",
   "source": "자비스",
-  "asOf": "2026-10-21",
-  "updatedAt": "2026-10-22T07:05:12+09:00",
+  "asOf": "2026-10-22",
+  "updatedAt": "2026-10-23T07:06:22+09:00",
   "currency": "KRW",
   "cashNow": 33571393,
-  "baseExpense": 3178720,
-  "currentMonthCard": 3407458,
+  "baseExpense": 3114509,
+  "currentMonthCard": 3279036,
   "monthComplete": false,
   "depletion": {
     "year": 2029,
-    "month": 11,
-    "day": 27
+    "month": 12,
+    "day": 21
   },
   "plans": [
     {
@@ -151,7 +151,7 @@
       "month": 10,
       "sales": 0,
       "purchase": 0,
-      "card": 2308278,
+      "card": 2327058,
       "bankIn": 0,
       "bankOut": 0,
       "cardPaid": 0,
@@ -327,7 +327,7 @@
       "status": "예정",
       "sales": 0,
       "purchase": 4500000,
-      "card": 3407458,
+      "card": 3279036,
       "bankIn": 0,
       "bankOut": 12099981,
       "endCash": 21471412
@@ -338,10 +338,10 @@
       "status": "예정",
       "sales": 56000000,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 61600000,
-      "bankOut": 3407458,
-      "endCash": 79663954
+      "bankOut": 3279036,
+      "endCash": 79792376
     },
     {
       "year": 2026,
@@ -349,10 +349,10 @@
       "status": "예정",
       "sales": 0,
       "purchase": 1800000,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 5158720,
-      "endCash": 74505234
+      "bankOut": 5094509,
+      "endCash": 74697867
     },
     {
       "year": 2027,
@@ -360,10 +360,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 8778720,
-      "endCash": 65726514
+      "bankOut": 8714509,
+      "endCash": 65983358
     },
     {
       "year": 2027,
@@ -371,10 +371,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 62547794
+      "bankOut": 3114509,
+      "endCash": 62868849
     },
     {
       "year": 2027,
@@ -382,10 +382,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 59369074
+      "bankOut": 3114509,
+      "endCash": 59754340
     },
     {
       "year": 2027,
@@ -393,10 +393,10 @@
       "status": "예정",
       "sales": 42000000,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 46200000,
-      "bankOut": 3178720,
-      "endCash": 102390354
+      "bankOut": 3114509,
+      "endCash": 102839831
     },
     {
       "year": 2027,
@@ -404,10 +404,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 99211634
+      "bankOut": 3114509,
+      "endCash": 99725322
     },
     {
       "year": 2027,
@@ -415,10 +415,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 96032914
+      "bankOut": 3114509,
+      "endCash": 96610813
     },
     {
       "year": 2027,
@@ -426,10 +426,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 7378720,
-      "endCash": 88654194
+      "bankOut": 7314509,
+      "endCash": 89296304
     },
     {
       "year": 2027,
@@ -437,10 +437,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 85475474
+      "bankOut": 3114509,
+      "endCash": 86181795
     },
     {
       "year": 2027,
@@ -448,10 +448,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 82296754
+      "bankOut": 3114509,
+      "endCash": 83067286
     },
     {
       "year": 2027,
@@ -459,10 +459,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 79118034
+      "bankOut": 3114509,
+      "endCash": 79952777
     },
     {
       "year": 2027,
@@ -470,10 +470,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 75939314
+      "bankOut": 3114509,
+      "endCash": 76838268
     },
     {
       "year": 2027,
@@ -481,10 +481,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 72760594
+      "bankOut": 3114509,
+      "endCash": 73723759
     },
     {
       "year": 2028,
@@ -492,10 +492,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 69581874
+      "bankOut": 3114509,
+      "endCash": 70609250
     },
     {
       "year": 2028,
@@ -503,10 +503,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 66403154
+      "bankOut": 3114509,
+      "endCash": 67494741
     },
     {
       "year": 2028,
@@ -514,10 +514,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 63224434
+      "bankOut": 3114509,
+      "endCash": 64380232
     },
     {
       "year": 2028,
@@ -525,10 +525,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 60045714
+      "bankOut": 3114509,
+      "endCash": 61265723
     },
     {
       "year": 2028,
@@ -536,10 +536,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 56866994
+      "bankOut": 3114509,
+      "endCash": 58151214
     },
     {
       "year": 2028,
@@ -547,10 +547,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 53688274
+      "bankOut": 3114509,
+      "endCash": 55036705
     },
     {
       "year": 2028,
@@ -558,10 +558,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 50509554
+      "bankOut": 3114509,
+      "endCash": 51922196
     },
     {
       "year": 2028,
@@ -569,10 +569,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 47330834
+      "bankOut": 3114509,
+      "endCash": 48807687
     },
     {
       "year": 2028,
@@ -580,10 +580,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 44152114
+      "bankOut": 3114509,
+      "endCash": 45693178
     },
     {
       "year": 2028,
@@ -591,10 +591,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 40973394
+      "bankOut": 3114509,
+      "endCash": 42578669
     },
     {
       "year": 2028,
@@ -602,10 +602,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 37794674
+      "bankOut": 3114509,
+      "endCash": 39464160
     },
     {
       "year": 2028,
@@ -613,10 +613,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 34615954
+      "bankOut": 3114509,
+      "endCash": 36349651
     },
     {
       "year": 2029,
@@ -624,10 +624,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 31437234
+      "bankOut": 3114509,
+      "endCash": 33235142
     },
     {
       "year": 2029,
@@ -635,10 +635,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 28258514
+      "bankOut": 3114509,
+      "endCash": 30120633
     },
     {
       "year": 2029,
@@ -646,10 +646,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 25079794
+      "bankOut": 3114509,
+      "endCash": 27006124
     },
     {
       "year": 2029,
@@ -657,10 +657,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 21901074
+      "bankOut": 3114509,
+      "endCash": 23891615
     },
     {
       "year": 2029,
@@ -668,10 +668,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 18722354
+      "bankOut": 3114509,
+      "endCash": 20777106
     },
     {
       "year": 2029,
@@ -679,10 +679,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 15543634
+      "bankOut": 3114509,
+      "endCash": 17662597
     },
     {
       "year": 2029,
@@ -690,10 +690,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 12364914
+      "bankOut": 3114509,
+      "endCash": 14548088
     },
     {
       "year": 2029,
@@ -701,10 +701,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 9186194
+      "bankOut": 3114509,
+      "endCash": 11433579
     },
     {
       "year": 2029,
@@ -712,10 +712,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 6007474
+      "bankOut": 3114509,
+      "endCash": 8319070
     },
     {
       "year": 2029,
@@ -723,10 +723,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": 2828754
+      "bankOut": 3114509,
+      "endCash": 5204561
     },
     {
       "year": 2029,
@@ -734,10 +734,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": -349966
+      "bankOut": 3114509,
+      "endCash": 2090052
     },
     {
       "year": 2029,
@@ -745,10 +745,10 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3178720,
+      "card": 3114509,
       "bankIn": 0,
-      "bankOut": 3178720,
-      "endCash": -3528686
+      "bankOut": 3114509,
+      "endCash": -1024457
     }
   ]
 }
