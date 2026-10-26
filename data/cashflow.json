@@ -1,17 +1,17 @@
 {
   "company": "주식회사 투핸즈",
   "source": "자비스",
-  "asOf": "2026-10-25",
-  "updatedAt": "2026-10-26T17:09:24+09:00",
+  "asOf": "2026-10-26",
+  "updatedAt": "2026-10-27T07:01:00+09:00",
   "currency": "KRW",
-  "cashNow": 30028613,
-  "baseExpense": 3064645,
-  "currentMonthCard": 3179308,
+  "cashNow": 30053278,
+  "baseExpense": 3015368,
+  "currentMonthCard": 3080754,
   "monthComplete": false,
   "depletion": {
     "year": 2028,
     "month": 11,
-    "day": 5
+    "day": 17
   },
   "plans": [
     {
@@ -161,12 +161,12 @@
       "month": 10,
       "sales": 0,
       "purchase": 0,
-      "card": 2563958,
-      "bankIn": 0,
-      "bankOut": 3542780,
+      "card": 2583858,
+      "bankIn": 29135,
+      "bankOut": 3547250,
       "cardPaid": 0,
       "vatPaid": 3542780,
-      "endCash": 30028613
+      "endCash": 30053278
     }
   ],
   "balances": {
@@ -179,7 +179,7 @@
     "2026-07": 424321,
     "2026-08": 40997862,
     "2026-09": 33571393,
-    "2026-10": 30028613
+    "2026-10": 30053278
   },
   "cardMixMonth": "2026-09",
   "cardMix": [
@@ -402,15 +402,26 @@
       "status": "진행",
       "sales": 0,
       "purchase": 0,
-      "card": 3179308,
-      "bankIn": 0,
-      "bankOut": 6492761,
-      "endCash": 27078632,
-      "income": [],
+      "card": 3080754,
+      "bankIn": 29135,
+      "bankOut": 6497231,
+      "endCash": 27103297,
+      "income": [
+        {
+          "name": "통장 입금",
+          "amount": 29135,
+          "note": "이미 입금"
+        }
+      ],
       "expense": [
         {
           "name": "부가세 납부",
           "amount": 3542780,
+          "note": "이미 출금"
+        },
+        {
+          "name": "기타 통장 출금",
+          "amount": 4470,
           "note": "이미 출금"
         },
         {
@@ -426,10 +437,10 @@
       "status": "예정",
       "sales": 56000000,
       "purchase": 4500000,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 61600000,
-      "bankOut": 8129308,
-      "endCash": 80549324,
+      "bankOut": 8030754,
+      "endCash": 80672543,
       "income": [
         {
           "name": "부가세 별도, 월말 입금",
@@ -440,7 +451,7 @@
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3179308,
+          "amount": 3080754,
           "note": "예상"
         },
         {
@@ -456,15 +467,15 @@
       "status": "예정",
       "sales": 0,
       "purchase": 1800000,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 5044645,
-      "endCash": 75504679,
+      "bankOut": 4995368,
+      "endCash": 75677175,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         },
         {
@@ -480,15 +491,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 8664645,
-      "endCash": 66840034,
+      "bankOut": 8615368,
+      "endCash": 67061807,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         },
         {
@@ -504,15 +515,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": 63775389,
+      "bankOut": 3015368,
+      "endCash": 64046439,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -523,15 +534,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": 60710744,
+      "bankOut": 3015368,
+      "endCash": 61031071,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -542,10 +553,10 @@
       "status": "예정",
       "sales": 42000000,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 46200000,
-      "bankOut": 3064645,
-      "endCash": 103846099,
+      "bankOut": 3015368,
+      "endCash": 104215703,
       "income": [
         {
           "name": "부가세 별도, 월말 입금",
@@ -556,7 +567,7 @@
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -567,15 +578,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": 100781454,
+      "bankOut": 3015368,
+      "endCash": 101200335,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -586,15 +597,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": 97716809,
+      "bankOut": 3015368,
+      "endCash": 98184967,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -605,15 +616,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 7264645,
-      "endCash": 90452164,
+      "bankOut": 7215368,
+      "endCash": 90969599,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         },
         {
@@ -629,15 +640,15 @@
       "status": "예정",
       "sales": 0,
       "purchase": 20000000,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 25064645,
-      "endCash": 65387519,
+      "bankOut": 25015368,
+      "endCash": 65954231,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         },
         {
@@ -653,15 +664,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": 62322874,
+      "bankOut": 3015368,
+      "endCash": 62938863,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -672,15 +683,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": 59258229,
+      "bankOut": 3015368,
+      "endCash": 59923495,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -691,15 +702,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": 56193584,
+      "bankOut": 3015368,
+      "endCash": 56908127,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -710,15 +721,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": 53128939,
+      "bankOut": 3015368,
+      "endCash": 53892759,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -729,15 +740,15 @@
       "status": "예정",
       "sales": 0,
       "purchase": 20000000,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 25064645,
-      "endCash": 28064294,
+      "bankOut": 25015368,
+      "endCash": 28877391,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         },
         {
@@ -753,15 +764,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": 24999649,
+      "bankOut": 3015368,
+      "endCash": 25862023,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -772,15 +783,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": 21935004,
+      "bankOut": 3015368,
+      "endCash": 22846655,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -791,15 +802,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": 18870359,
+      "bankOut": 3015368,
+      "endCash": 19831287,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -810,15 +821,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": 15805714,
+      "bankOut": 3015368,
+      "endCash": 16815919,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -829,15 +840,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": 12741069,
+      "bankOut": 3015368,
+      "endCash": 13800551,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -848,15 +859,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": 9676424,
+      "bankOut": 3015368,
+      "endCash": 10785183,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -867,15 +878,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": 6611779,
+      "bankOut": 3015368,
+      "endCash": 7769815,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -886,15 +897,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": 3547134,
+      "bankOut": 3015368,
+      "endCash": 4754447,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -905,15 +916,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": 482489,
+      "bankOut": 3015368,
+      "endCash": 1739079,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -924,15 +935,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": -2582156,
+      "bankOut": 3015368,
+      "endCash": -1276289,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -943,15 +954,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": -5646801,
+      "bankOut": 3015368,
+      "endCash": -4291657,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -962,15 +973,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": -8711446,
+      "bankOut": 3015368,
+      "endCash": -7307025,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -981,15 +992,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": -11776091,
+      "bankOut": 3015368,
+      "endCash": -10322393,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -1000,15 +1011,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": -14840736,
+      "bankOut": 3015368,
+      "endCash": -13337761,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -1019,15 +1030,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": -17905381,
+      "bankOut": 3015368,
+      "endCash": -16353129,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -1038,15 +1049,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": -20970026,
+      "bankOut": 3015368,
+      "endCash": -19368497,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -1057,15 +1068,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": -24034671,
+      "bankOut": 3015368,
+      "endCash": -22383865,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -1076,15 +1087,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": -27099316,
+      "bankOut": 3015368,
+      "endCash": -25399233,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -1095,15 +1106,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": -30163961,
+      "bankOut": 3015368,
+      "endCash": -28414601,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -1114,15 +1125,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": -33228606,
+      "bankOut": 3015368,
+      "endCash": -31429969,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -1133,15 +1144,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": -36293251,
+      "bankOut": 3015368,
+      "endCash": -34445337,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -1152,15 +1163,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": -39357896,
+      "bankOut": 3015368,
+      "endCash": -37460705,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
@@ -1171,15 +1182,15 @@
       "status": "예상",
       "sales": 0,
       "purchase": 0,
-      "card": 3064645,
+      "card": 3015368,
       "bankIn": 0,
-      "bankOut": 3064645,
-      "endCash": -42422541,
+      "bankOut": 3015368,
+      "endCash": -40476073,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
-          "amount": 3064645,
+          "amount": 3015368,
           "note": "예상"
         }
       ]
