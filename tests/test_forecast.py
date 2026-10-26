@@ -98,6 +98,25 @@ class ForecastTest(unittest.TestCase):
         self.assertEqual(by[(2026, 4)]["bankOut"], 1_500_000)
         self.assertEqual(by[(2026, 7)]["bankOut"], 0)
 
+    def test_settled_july_to_september_vat_leaves_october_and_keeps_later_vat(self):
+        actuals = [
+            month(2026, 8, sales=42_000_000),
+            month(2026, 9, card=2_949_981),
+            month(2026, 10, card=2_563_958, bank_out=3_542_780),
+        ]
+        forecast = build_forecast(
+            actuals,
+            date(2026, 10, 25),
+            30_028_613,
+            [PlannedSale(2026, 11, 30, 56_000_000)],
+            expenses=[PlannedExpense(2026, 10, 30, 4_500_000, "침대구입")],
+            settled_vat=[(2026, 10)],
+        )
+        by = {(row["year"], row["month"]): row for row in forecast["rows"]}
+        self.assertEqual(by[(2026, 10)]["bankOut"], 11_442_761)
+        self.assertEqual(by[(2026, 10)]["endCash"], 22_128_632)
+        self.assertEqual(by[(2027, 1)]["bankOut"], 8_664_645)
+
     def test_vat_already_paid_this_month_is_not_charged_again(self):
         actuals = [
             month(2026, 8, sales=42_000_000),

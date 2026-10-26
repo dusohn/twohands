@@ -99,6 +99,7 @@ def build_forecast(
     plans: list[PlannedSale],
     horizon_years: int = 3,
     expenses: list[PlannedExpense] | None = None,
+    settled_vat: list[tuple[int, int]] | None = None,
 ) -> dict:
     if not actuals:
         raise ValueError("no actual months")
@@ -129,6 +130,7 @@ def build_forecast(
     booked = _booked_plans(plans, by_month, as_of, month_complete)
     booked_expenses = _open_expenses(expenses or [], as_of, month_complete)
     vat_by_month = _vat_by_month(actuals, booked, current, month_complete)
+    settled = set(settled_vat or [])
 
     rows: list[dict] = []
     ordered = sorted(by_month)
@@ -140,7 +142,7 @@ def build_forecast(
             rows.append(_actual_row(row))
             continue
         remaining_bill = max(0, last_full_card - row.card_paid)
-        unpaid_vat = max(0, vat_by_month.get(key, 0) - row.vat_paid)
+        unpaid_vat = _vat_still_due(key, vat_by_month, row.vat_paid, settled)
         plan_supply, plan_gross = _plan_amounts(booked, key, row.sales)
         expense_supply, expense_gross = _expense_amounts(booked_expenses, key)
         end_cash = cash_now - remaining_bill - unpaid_vat + plan_gross - expense_gross
@@ -167,7 +169,7 @@ def build_forecast(
     while cursor <= guard:
         plan_supply, plan_gross = _plan_amounts(booked, cursor, already_sales=0)
         expense_supply, expense_gross = _expense_amounts(booked_expenses, cursor)
-        vat = vat_by_month.get(cursor, 0)
+        vat = _vat_still_due(cursor, vat_by_month, 0, settled)
         bank_out = bill + vat + expense_gross
         cash = cash - bank_out + plan_gross
         rows.append(
@@ -196,6 +198,22 @@ def build_forecast(
         "depletion": depletion,
         "rows": rows,
     }
+
+
+def _vat_still_due(
+    key: tuple[int, int],
+    vat_by_month: dict[tuple[int, int], int],
+    vat_paid: int,
+    settled: set[tuple[int, int]],
+) -> int:
+    """Output VAT still to leave the bank in a filing month.
+
+    A filing month listed as already paid is left out even when Jobis did not
+    classify the withdrawal as 부가세납부.
+    """
+    if key in settled:
+        return 0
+    return max(0, vat_by_month.get(key, 0) - vat_paid)
 
 
 def _vat_by_month(
