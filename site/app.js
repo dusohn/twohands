@@ -325,7 +325,7 @@ function renderCashflow(data, rows) {
   return `
     <div class="cf-card">
       <h2>Cashflow — 월별 현금흐름 12개월 전망</h2>
-      <p class="cf-note">자비스 원장과 화면에서 저장한 예정 매출, 예정 지출로 집계합니다. 지출은 음수로 표시합니다. 카드 대금은 사용 다음 달 통장 출금이고, 매출 부가세는 1·4·7·10월 통장 출금에 포함됩니다. 예정 지출은 그 달 통장 출금에 공급가액과 부가세 10%가 함께 나갑니다. 매출·매입·카드는 발생 기준 참고 금액입니다.</p>
+      <p class="cf-note">자비스 원장과 화면에서 저장한 예정 매출, 예정 지출로 집계합니다. 지출은 음수로 표시합니다. 카드 대금은 사용 다음 달 통장 출금이고, 매출 부가세는 1·4·7·10월 통장 출금에 포함됩니다. 2026년 7–9월분은 10월 통장 출금 3,542,780원으로 이미 나갔고, 공급가액의 10%를 그 위에 다시 빼지 않습니다. 예정 지출은 그 달 통장 출금에 공급가액과 부가세 10%가 함께 나갑니다. 매출·매입·카드는 발생 기준 참고 금액입니다.</p>
       <div class="tbl-wrap" style="max-height:72vh; overflow:auto;">
       <table class="cf">
         <tr><th class="sticky-col" style="z-index:2; text-align:center">구분</th>${rows
