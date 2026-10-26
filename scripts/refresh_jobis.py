@@ -269,7 +269,7 @@ def _month_actual(row: dict) -> MonthActual:
 
 def _sale(item: dict) -> PlannedSale:
     year, month, day = _date_parts(item["date"])
-    return PlannedSale(year, month, day, int(item["supply"]))
+    return PlannedSale(year, month, day, int(item["supply"]), str(item.get("note") or ""))
 
 
 def _expense(item: dict) -> PlannedExpense:

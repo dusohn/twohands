@@ -35,6 +35,7 @@ class PlannedSale:
     month: int
     day: int
     supply: int
+    note: str = ""
 
     @property
     def vat(self) -> int:
@@ -146,6 +147,13 @@ def build_forecast(
         plan_supply, plan_gross = _plan_amounts(booked, key, row.sales)
         expense_supply, expense_gross = _expense_amounts(booked_expenses, key)
         end_cash = cash_now - remaining_bill - unpaid_vat + plan_gross - expense_gross
+        income, expense = _bank_lines(row.bank_in, row.bank_out, row.card_paid, row.vat_paid)
+        income.extend(_sale_lines(booked, key, row.sales))
+        if remaining_bill:
+            expense.append({"name": "카드 대금", "amount": remaining_bill, "note": "지난달 사용분"})
+        if unpaid_vat:
+            expense.append({"name": "매출 부가세", "amount": unpaid_vat, "note": "납부 예정"})
+        expense.extend(_expense_lines(booked_expenses, key))
         rows.append(
             {
                 "year": row.year,
@@ -157,6 +165,8 @@ def build_forecast(
                 "bankIn": row.bank_in + plan_gross,
                 "bankOut": row.bank_out + remaining_bill + unpaid_vat + expense_gross,
                 "endCash": end_cash,
+                "income": income,
+                "expense": expense,
             }
         )
 
@@ -172,6 +182,13 @@ def build_forecast(
         vat = _vat_still_due(cursor, vat_by_month, 0, settled)
         bank_out = bill + vat + expense_gross
         cash = cash - bank_out + plan_gross
+        income = _sale_lines(booked, cursor)
+        expense: list[dict] = []
+        if bill:
+            expense.append({"name": "카드 대금", "amount": bill, "note": "예상"})
+        if vat:
+            expense.append({"name": "매출 부가세", "amount": vat, "note": "납부 예정"})
+        expense.extend(_expense_lines(booked_expenses, cursor))
         rows.append(
             {
                 "year": cursor[0],
@@ -183,6 +200,8 @@ def build_forecast(
                 "bankIn": plan_gross,
                 "bankOut": bank_out,
                 "endCash": cash,
+                "income": income,
+                "expense": expense,
             }
         )
         if cursor >= end_key and cash < 0:
@@ -304,7 +323,59 @@ def _plan_amounts(plans: list[PlannedSale], key: tuple[int, int], already_sales:
     return supply, gross
 
 
+def _won(amount: int) -> str:
+    return f"{amount:,}"
+
+
+def _bank_lines(bank_in: int, bank_out: int, card_paid: int, vat_paid: int) -> tuple[list[dict], list[dict]]:
+    income = [{"name": "통장 입금", "amount": bank_in, "note": "이미 입금"}] if bank_in else []
+    paid_card = min(max(card_paid, 0), max(bank_out, 0))
+    paid_vat = min(max(vat_paid, 0), max(bank_out - paid_card, 0))
+    other = bank_out - paid_card - paid_vat
+    expense = []
+    if paid_card:
+        expense.append({"name": "카드 대금", "amount": paid_card, "note": "이미 출금"})
+    if paid_vat:
+        expense.append({"name": "부가세 납부", "amount": paid_vat, "note": "이미 출금"})
+    if other:
+        expense.append({"name": "기타 통장 출금", "amount": other, "note": "이미 출금"})
+    return income, expense
+
+
+def _sale_lines(plans: list[PlannedSale], key: tuple[int, int], already_sales: int = 0) -> list[dict]:
+    lines = []
+    for plan in plans:
+        if _key(plan.year, plan.month) != key:
+            continue
+        if already_sales >= int(plan.supply * 0.9):
+            continue
+        lines.append(
+            {
+                "name": plan.note or "예정 매출",
+                "amount": plan.gross,
+                "note": f"{plan.day}일 · 공급가 {_won(plan.supply)}원 · 부가세 {_won(plan.vat)}원",
+            }
+        )
+    return lines
+
+
+def _expense_lines(expenses: list[PlannedExpense], key: tuple[int, int]) -> list[dict]:
+    lines = []
+    for expense in expenses:
+        if _key(expense.year, expense.month) != key:
+            continue
+        lines.append(
+            {
+                "name": expense.note or "예정 지출",
+                "amount": expense.gross,
+                "note": f"{expense.day}일 · 공급가 {_won(expense.supply)}원 · 부가세 {_won(expense.vat)}원",
+            }
+        )
+    return lines
+
+
 def _actual_row(row: MonthActual) -> dict:
+    income, expense = _bank_lines(row.bank_in, row.bank_out, row.card_paid, row.vat_paid)
     return {
         "year": row.year,
         "month": row.month,
@@ -315,6 +386,8 @@ def _actual_row(row: MonthActual) -> dict:
         "bankIn": row.bank_in,
         "bankOut": row.bank_out,
         "endCash": 0,
+        "income": income,
+        "expense": expense,
     }
 
 

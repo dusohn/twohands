@@ -2,7 +2,7 @@
   "company": "주식회사 투핸즈",
   "source": "자비스",
   "asOf": "2026-10-25",
-  "updatedAt": "2026-10-26T13:58:22+09:00",
+  "updatedAt": "2026-10-26T14:03:49+09:00",
   "currency": "KRW",
   "cashNow": 30028613,
   "baseExpense": 3064645,
@@ -232,7 +232,9 @@
       "card": 0,
       "bankIn": 0,
       "bankOut": 0,
-      "endCash": 0
+      "endCash": 0,
+      "income": [],
+      "expense": []
     },
     {
       "year": 2026,
@@ -243,7 +245,9 @@
       "card": 0,
       "bankIn": 0,
       "bankOut": 0,
-      "endCash": 0
+      "endCash": 0,
+      "income": [],
+      "expense": []
     },
     {
       "year": 2026,
@@ -254,7 +258,9 @@
       "card": 0,
       "bankIn": 0,
       "bankOut": 0,
-      "endCash": 0
+      "endCash": 0,
+      "income": [],
+      "expense": []
     },
     {
       "year": 2026,
@@ -265,7 +271,9 @@
       "card": 0,
       "bankIn": 0,
       "bankOut": 0,
-      "endCash": 0
+      "endCash": 0,
+      "income": [],
+      "expense": []
     },
     {
       "year": 2026,
@@ -276,7 +284,9 @@
       "card": 0,
       "bankIn": 0,
       "bankOut": 0,
-      "endCash": 0
+      "endCash": 0,
+      "income": [],
+      "expense": []
     },
     {
       "year": 2026,
@@ -287,7 +297,9 @@
       "card": 0,
       "bankIn": 0,
       "bankOut": 0,
-      "endCash": 0
+      "endCash": 0,
+      "income": [],
+      "expense": []
     },
     {
       "year": 2026,
@@ -298,7 +310,26 @@
       "card": 0,
       "bankIn": 604101,
       "bankOut": 179780,
-      "endCash": 424321
+      "endCash": 424321,
+      "income": [
+        {
+          "name": "통장 입금",
+          "amount": 604101,
+          "note": "이미 입금"
+        }
+      ],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 161080,
+          "note": "이미 출금"
+        },
+        {
+          "name": "기타 통장 출금",
+          "amount": 18700,
+          "note": "이미 출금"
+        }
+      ]
     },
     {
       "year": 2026,
@@ -309,7 +340,21 @@
       "card": 7191225,
       "bankIn": 46202125,
       "bankOut": 5628584,
-      "endCash": 40997862
+      "endCash": 40997862,
+      "income": [
+        {
+          "name": "통장 입금",
+          "amount": 46202125,
+          "note": "이미 입금"
+        }
+      ],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 5628584,
+          "note": "이미 출금"
+        }
+      ]
     },
     {
       "year": 2026,
@@ -320,7 +365,26 @@
       "card": 2949981,
       "bankIn": 35948,
       "bankOut": 7462417,
-      "endCash": 33571393
+      "endCash": 33571393,
+      "income": [
+        {
+          "name": "통장 입금",
+          "amount": 35948,
+          "note": "이미 입금"
+        }
+      ],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 7456887,
+          "note": "이미 출금"
+        },
+        {
+          "name": "기타 통장 출금",
+          "amount": 5530,
+          "note": "이미 출금"
+        }
+      ]
     },
     {
       "year": 2026,
@@ -331,7 +395,25 @@
       "card": 3179308,
       "bankIn": 0,
       "bankOut": 11442761,
-      "endCash": 22128632
+      "endCash": 22128632,
+      "income": [],
+      "expense": [
+        {
+          "name": "부가세 납부",
+          "amount": 3542780,
+          "note": "이미 출금"
+        },
+        {
+          "name": "카드 대금",
+          "amount": 2949981,
+          "note": "지난달 사용분"
+        },
+        {
+          "name": "침대구입",
+          "amount": 4950000,
+          "note": "30일 · 공급가 4,500,000원 · 부가세 450,000원"
+        }
+      ]
     },
     {
       "year": 2026,
@@ -342,7 +424,21 @@
       "card": 3064645,
       "bankIn": 61600000,
       "bankOut": 3179308,
-      "endCash": 80549324
+      "endCash": 80549324,
+      "income": [
+        {
+          "name": "부가세 별도, 월말 입금",
+          "amount": 61600000,
+          "note": "30일 · 공급가 56,000,000원 · 부가세 5,600,000원"
+        }
+      ],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3179308,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2026,
@@ -353,7 +449,20 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 5044645,
-      "endCash": 75504679
+      "endCash": 75504679,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        },
+        {
+          "name": "현탁 핸드폰",
+          "amount": 1980000,
+          "note": "25일 · 공급가 1,800,000원 · 부가세 180,000원"
+        }
+      ]
     },
     {
       "year": 2027,
@@ -364,7 +473,20 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 8664645,
-      "endCash": 66840034
+      "endCash": 66840034,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        },
+        {
+          "name": "매출 부가세",
+          "amount": 5600000,
+          "note": "납부 예정"
+        }
+      ]
     },
     {
       "year": 2027,
@@ -375,7 +497,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 63775389
+      "endCash": 63775389,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2027,
@@ -386,7 +516,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 60710744
+      "endCash": 60710744,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2027,
@@ -397,7 +535,21 @@
       "card": 3064645,
       "bankIn": 46200000,
       "bankOut": 3064645,
-      "endCash": 103846099
+      "endCash": 103846099,
+      "income": [
+        {
+          "name": "부가세 별도, 월말 입금",
+          "amount": 46200000,
+          "note": "30일 · 공급가 42,000,000원 · 부가세 4,200,000원"
+        }
+      ],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2027,
@@ -408,7 +560,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 100781454
+      "endCash": 100781454,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2027,
@@ -419,7 +579,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 97716809
+      "endCash": 97716809,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2027,
@@ -430,7 +598,20 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 7264645,
-      "endCash": 90452164
+      "endCash": 90452164,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        },
+        {
+          "name": "매출 부가세",
+          "amount": 4200000,
+          "note": "납부 예정"
+        }
+      ]
     },
     {
       "year": 2027,
@@ -441,7 +622,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 87387519
+      "endCash": 87387519,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2027,
@@ -452,7 +641,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 84322874
+      "endCash": 84322874,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2027,
@@ -463,7 +660,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 81258229
+      "endCash": 81258229,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2027,
@@ -474,7 +679,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 78193584
+      "endCash": 78193584,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2027,
@@ -485,7 +698,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 75128939
+      "endCash": 75128939,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2028,
@@ -496,7 +717,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 72064294
+      "endCash": 72064294,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2028,
@@ -507,7 +736,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 68999649
+      "endCash": 68999649,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2028,
@@ -518,7 +755,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 65935004
+      "endCash": 65935004,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2028,
@@ -529,7 +774,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 62870359
+      "endCash": 62870359,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2028,
@@ -540,7 +793,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 59805714
+      "endCash": 59805714,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2028,
@@ -551,7 +812,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 56741069
+      "endCash": 56741069,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2028,
@@ -562,7 +831,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 53676424
+      "endCash": 53676424,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2028,
@@ -573,7 +850,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 50611779
+      "endCash": 50611779,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2028,
@@ -584,7 +869,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 47547134
+      "endCash": 47547134,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2028,
@@ -595,7 +888,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 44482489
+      "endCash": 44482489,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2028,
@@ -606,7 +907,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 41417844
+      "endCash": 41417844,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2028,
@@ -617,7 +926,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 38353199
+      "endCash": 38353199,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2029,
@@ -628,7 +945,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 35288554
+      "endCash": 35288554,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2029,
@@ -639,7 +964,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 32223909
+      "endCash": 32223909,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2029,
@@ -650,7 +983,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 29159264
+      "endCash": 29159264,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2029,
@@ -661,7 +1002,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 26094619
+      "endCash": 26094619,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2029,
@@ -672,7 +1021,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 23029974
+      "endCash": 23029974,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2029,
@@ -683,7 +1040,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 19965329
+      "endCash": 19965329,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2029,
@@ -694,7 +1059,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 16900684
+      "endCash": 16900684,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2029,
@@ -705,7 +1078,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 13836039
+      "endCash": 13836039,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2029,
@@ -716,7 +1097,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 10771394
+      "endCash": 10771394,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2029,
@@ -727,7 +1116,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 7706749
+      "endCash": 7706749,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2029,
@@ -738,7 +1135,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 4642104
+      "endCash": 4642104,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2029,
@@ -749,7 +1154,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 1577459
+      "endCash": 1577459,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     },
     {
       "year": 2030,
@@ -760,7 +1173,15 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": -1487186
+      "endCash": -1487186,
+      "income": [],
+      "expense": [
+        {
+          "name": "카드 대금",
+          "amount": 3064645,
+          "note": "예상"
+        }
+      ]
     }
   ]
 }
