@@ -6,6 +6,7 @@ let commitSha = null;
 const TABS = [
   ["dashboard", "Dashboard"],
   ["cashflow", "Cashflow"],
+  ["detail", "상세"],
   ["cards", "Cards"],
 ];
 
@@ -13,6 +14,7 @@ const REPO = "dusohn/twohands";
 const state = {
   tab: "dashboard",
   year: null,
+  detailMonth: null,
   sales: [],
   expenses: [],
   saveMessage: "",
@@ -269,7 +271,7 @@ function renderDashboard(data, rows) {
         ${rows
           .map(
             (row, index) => `<tr>
-            <td style="text-align:center">${ym(row.year, row.month)}</td>
+            <td style="text-align:center"><button type="button" class="month-link" data-detail-month="${row.month}">${ym(row.year, row.month)}</button></td>
             <td class="num">${fmt(opening[index])}</td>
             <td class="${cls(row.bankIn)}">${fmt(row.bankIn)}</td>
             <td class="${cls(-row.bankOut)}">${fmt(-row.bankOut)}</td>
@@ -348,6 +350,67 @@ function renderCashflow(data, rows) {
     </div>`;
 }
 
+function selectedDetailMonth(data) {
+  if (state.detailMonth >= 1 && state.detailMonth <= 12) return state.detailMonth;
+  const parts = String(data.asOf || "").split("-");
+  const year = Number(parts[0]);
+  const month = Number(parts[1]);
+  if (year === state.year && month >= 1 && month <= 12) return month;
+  return 1;
+}
+
+function detailTable(title, lines, total, sign) {
+  const body = lines.length
+    ? lines
+        .map(
+          (line) => `<tr>
+            <td>${esc(line.name)}</td>
+            <td class="${cls(sign * line.amount)}">${fmt(sign * line.amount)}</td>
+            <td class="detail-note">${esc(line.note || "")}</td>
+          </tr>`
+        )
+        .join("")
+    : '<tr><td colspan="3" class="empty">항목이 없습니다.</td></tr>';
+  return `<div class="cf-card">
+      <h2>${title}</h2>
+      <div class="tbl-wrap"><table class="cf detail">
+        <tr><th style="text-align:left">항목</th><th class="num">금액</th><th style="text-align:left">내용</th></tr>
+        ${body}
+        <tr class="row-sum"><td>합계</td><td class="${cls(sign * total)}">${fmt(sign * total)}</td><td></td></tr>
+      </table></div>
+    </div>`;
+}
+
+function renderDetail(data, rows) {
+  const month = selectedDetailMonth(data);
+  state.detailMonth = month;
+  const row = rows[month - 1];
+  const income = row.income || [];
+  const expense = row.expense || [];
+  const months = Array.from({ length: 12 }, (_, index) => index + 1);
+  return `
+    <div class="toolbar">${months
+      .map(
+        (item) =>
+          `<button type="button" class="btn ${item === month ? "btn-p" : "btn-g"}" data-month="${item}">${item}월</button>`
+      )
+      .join("")}</div>
+    <div class="cf-card">
+      <h2>${row.year}년 ${row.month}월 수입·지출 ${statusBadge(row.status, row.endCash)}</h2>
+      <p class="cf-note">수입은 그 달 통장 입금이고, 지출은 그 달 통장 출금입니다. 예정 매출과 예정 지출은 공급가액에 부가세 10%를 더한 총액입니다. 이미 나간 금액은 잔고에 반영되어 있습니다.</p>
+      <div class="kpis">
+        <div class="kpi"><div class="k">수입</div><div class="v pos">${fmt(row.bankIn)}원</div></div>
+        <div class="kpi"><div class="k">지출</div><div class="v neg">${fmt(-row.bankOut)}원</div></div>
+        <div class="kpi"><div class="k">순현금흐름</div><div class="v ${row.bankIn - row.bankOut < 0 ? "neg" : "pos"}">${fmt(row.bankIn - row.bankOut)}원</div></div>
+        <div class="kpi"><div class="k">기말 현금</div><div class="v ${row.endCash < 0 ? "neg" : ""}">${fmt(row.endCash)}원</div></div>
+      </div>
+    </div>
+    <div class="detail-grid">
+      ${detailTable("수입", income, row.bankIn, 1)}
+      ${detailTable("지출", expense, row.bankOut, -1)}
+    </div>`;
+}
+
 function renderCards(data) {
   const mix = data.cardMix || [];
   const total = mix.reduce((sum, row) => sum + row.amount, 0) || 1;
@@ -402,14 +465,30 @@ function render(data) {
   const view =
     state.tab === "cashflow"
       ? renderCashflow(data, rows)
-      : state.tab === "cards"
-        ? renderCards(data)
-        : renderDashboard(data, rows);
+      : state.tab === "detail"
+        ? renderDetail(data, rows)
+        : state.tab === "cards"
+          ? renderCards(data)
+          : renderDashboard(data, rows);
   body.innerHTML = yearButtons(years) + view;
   body.querySelectorAll("[data-year]").forEach((button) => {
     button.onclick = () => {
       capturePlans();
       state.year = Number(button.dataset.year);
+      render(data);
+    };
+  });
+  body.querySelectorAll("[data-month]").forEach((button) => {
+    button.onclick = () => {
+      state.detailMonth = Number(button.dataset.month);
+      render(data);
+    };
+  });
+  body.querySelectorAll("[data-detail-month]").forEach((button) => {
+    button.onclick = () => {
+      capturePlans();
+      state.detailMonth = Number(button.dataset.detailMonth);
+      state.tab = "detail";
       render(data);
     };
   });

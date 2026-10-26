@@ -117,6 +117,58 @@ class ForecastTest(unittest.TestCase):
         self.assertEqual(by[(2026, 10)]["endCash"], 22_128_632)
         self.assertEqual(by[(2027, 1)]["bankOut"], 8_664_645)
 
+    def test_month_lines_match_cash_and_name_october_vat(self):
+        actuals = [
+            month(2026, 8, sales=42_000_000, bank_in=46_202_125, bank_out=5_628_584, card_paid=5_628_584),
+            month(2026, 9, card=2_949_981, bank_in=35_948, bank_out=7_462_417, card_paid=7_456_887),
+            month(2026, 10, card=2_563_958, bank_out=3_542_780, vat_paid=3_542_780),
+        ]
+        forecast = build_forecast(
+            actuals,
+            date(2026, 10, 25),
+            30_028_613,
+            [PlannedSale(2026, 11, 30, 56_000_000, "부가세 별도, 월말 입금")],
+            expenses=[
+                PlannedExpense(2026, 10, 30, 4_500_000, "침대구입"),
+                PlannedExpense(2026, 12, 25, 1_800_000, "현탁 핸드폰"),
+            ],
+            settled_vat=[(2026, 10)],
+        )
+        by = {(row["year"], row["month"]): row for row in forecast["rows"]}
+        for row in forecast["rows"]:
+            self.assertEqual(sum(line["amount"] for line in row["income"]), row["bankIn"])
+            self.assertEqual(sum(line["amount"] for line in row["expense"]), row["bankOut"])
+        self.assertEqual(
+            by[(2026, 9)]["expense"],
+            [
+                {"name": "카드 대금", "amount": 7_456_887, "note": "이미 출금"},
+                {"name": "기타 통장 출금", "amount": 5_530, "note": "이미 출금"},
+            ],
+        )
+        self.assertEqual(
+            by[(2026, 10)]["expense"],
+            [
+                {"name": "부가세 납부", "amount": 3_542_780, "note": "이미 출금"},
+                {"name": "카드 대금", "amount": 2_949_981, "note": "지난달 사용분"},
+                {"name": "침대구입", "amount": 4_950_000, "note": "30일 · 공급가 4,500,000원 · 부가세 450,000원"},
+            ],
+        )
+        self.assertEqual(
+            by[(2026, 11)]["income"],
+            [
+                {
+                    "name": "부가세 별도, 월말 입금",
+                    "amount": 61_600_000,
+                    "note": "30일 · 공급가 56,000,000원 · 부가세 5,600,000원",
+                }
+            ],
+        )
+        self.assertEqual(by[(2026, 11)]["expense"], [{"name": "카드 대금", "amount": 3_179_308, "note": "예상"}])
+        self.assertEqual(
+            by[(2026, 12)]["expense"][1],
+            {"name": "현탁 핸드폰", "amount": 1_980_000, "note": "25일 · 공급가 1,800,000원 · 부가세 180,000원"},
+        )
+
     def test_vat_already_paid_this_month_is_not_charged_again(self):
         actuals = [
             month(2026, 8, sales=42_000_000),
