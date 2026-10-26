@@ -2,7 +2,7 @@
   "company": "주식회사 투핸즈",
   "source": "자비스",
   "asOf": "2026-10-25",
-  "updatedAt": "2026-10-26T14:53:57+09:00",
+  "updatedAt": "2026-10-26T15:06:53+09:00",
   "currency": "KRW",
   "cashNow": 30028613,
   "baseExpense": 3064645,
@@ -37,12 +37,12 @@
       "note": "현탁 핸드폰"
     },
     {
-      "date": "2027-01-31",
+      "date": "2027-08-31",
       "supply": 30000000,
       "note": "가족여행"
     },
     {
-      "date": "2027-08-31",
+      "date": "2028-01-31",
       "supply": 30000000,
       "note": "가족여행"
     }
@@ -477,13 +477,13 @@
     {
       "year": 2027,
       "month": 1,
-      "status": "예정",
+      "status": "예상",
       "sales": 0,
-      "purchase": 30000000,
+      "purchase": 0,
       "card": 3064645,
       "bankIn": 0,
-      "bankOut": 41664645,
-      "endCash": 33840034,
+      "bankOut": 8664645,
+      "endCash": 66840034,
       "income": [],
       "expense": [
         {
@@ -495,11 +495,6 @@
           "name": "매출 부가세",
           "amount": 5600000,
           "note": "납부 예정"
-        },
-        {
-          "name": "가족여행",
-          "amount": 33000000,
-          "note": "31일 · 공급가 30,000,000원 · 부가세 3,000,000원"
         }
       ]
     },
@@ -512,7 +507,7 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 30775389,
+      "endCash": 63775389,
       "income": [],
       "expense": [
         {
@@ -531,7 +526,7 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 27710744,
+      "endCash": 60710744,
       "income": [],
       "expense": [
         {
@@ -550,7 +545,7 @@
       "card": 3064645,
       "bankIn": 46200000,
       "bankOut": 3064645,
-      "endCash": 70846099,
+      "endCash": 103846099,
       "income": [
         {
           "name": "부가세 별도, 월말 입금",
@@ -575,7 +570,7 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 67781454,
+      "endCash": 100781454,
       "income": [],
       "expense": [
         {
@@ -594,7 +589,7 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 64716809,
+      "endCash": 97716809,
       "income": [],
       "expense": [
         {
@@ -613,7 +608,7 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 7264645,
-      "endCash": 57452164,
+      "endCash": 90452164,
       "income": [],
       "expense": [
         {
@@ -637,7 +632,7 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 36064645,
-      "endCash": 21387519,
+      "endCash": 54387519,
       "income": [],
       "expense": [
         {
@@ -661,7 +656,7 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 18322874,
+      "endCash": 51322874,
       "income": [],
       "expense": [
         {
@@ -680,7 +675,7 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 15258229,
+      "endCash": 48258229,
       "income": [],
       "expense": [
         {
@@ -699,7 +694,7 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 12193584,
+      "endCash": 45193584,
       "income": [],
       "expense": [
         {
@@ -718,7 +713,7 @@
       "card": 3064645,
       "bankIn": 0,
       "bankOut": 3064645,
-      "endCash": 9128939,
+      "endCash": 42128939,
       "income": [],
       "expense": [
         {
@@ -731,12 +726,12 @@
     {
       "year": 2028,
       "month": 1,
-      "status": "예상",
+      "status": "예정",
       "sales": 0,
-      "purchase": 0,
+      "purchase": 30000000,
       "card": 3064645,
       "bankIn": 0,
-      "bankOut": 3064645,
+      "bankOut": 36064645,
       "endCash": 6064294,
       "income": [],
       "expense": [
@@ -744,6 +739,11 @@
           "name": "카드 대금",
           "amount": 3064645,
           "note": "예상"
+        },
+        {
+          "name": "가족여행",
+          "amount": 33000000,
+          "note": "31일 · 공급가 30,000,000원 · 부가세 3,000,000원"
         }
       ]
     },
