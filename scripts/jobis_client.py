@@ -149,6 +149,14 @@ def _as_of(hit: dict, today: date) -> date:
     return parsed if parsed <= today else today
 
 
+def _category_amounts(amounts: dict[str, int]) -> list[dict]:
+    return [
+        {"name": name, "amount": amount}
+        for name, amount in sorted(amounts.items(), key=lambda item: (-item[1], item[0]))
+        if amount
+    ]
+
+
 def _month_numbers(payload: dict) -> list[int]:
     months = []
     for label in payload.get("category") or []:
@@ -195,6 +203,8 @@ def reduce_snapshot(
 
     bank_in: dict[tuple[int, int], int] = defaultdict(int)
     bank_out: dict[tuple[int, int], int] = defaultdict(int)
+    bank_in_lines: dict[tuple[int, int], dict[str, int]] = defaultdict(lambda: defaultdict(int))
+    bank_out_lines: dict[tuple[int, int], dict[str, int]] = defaultdict(lambda: defaultdict(int))
     card_paid: dict[tuple[int, int], int] = defaultdict(int)
     vat_paid: dict[tuple[int, int], int] = defaultdict(int)
     for row in bank:
@@ -204,11 +214,16 @@ def reduce_snapshot(
         key = (int(stamp[0:4]), int(stamp[4:6]))
         incoming = won(row.get("histct_i_krw") or row.get("histct_i"))
         outgoing = won(row.get("histct_o_krw") or row.get("histct_o"))
+        category = str(row.get("cate_name") or "미분류")
         bank_in[key] += incoming
         bank_out[key] += outgoing
-        if row.get("cate_name") == "신용/체크카드결제":
+        if incoming:
+            bank_in_lines[key][category] += incoming
+        if outgoing:
+            bank_out_lines[key][category] += outgoing
+        if category == "신용/체크카드결제":
             card_paid[key] += outgoing
-        elif row.get("cate_name") == "부가세납부":
+        elif category == "부가세납부":
             vat_paid[key] += outgoing
 
     mix_key = (as_of.year, as_of.month - 1) if as_of.month > 1 else (as_of.year - 1, 12)
@@ -242,6 +257,8 @@ def reduce_snapshot(
                 "bankOut": bank_out.get(key, 0),
                 "cardPaid": card_paid.get(key, 0),
                 "vatPaid": vat_paid.get(key, 0),
+                "bankInLines": _category_amounts(bank_in_lines.get(key, {})),
+                "bankOutLines": _category_amounts(bank_out_lines.get(key, {})),
                 "endCash": balances.get(key, 0),
             }
         )

@@ -264,7 +264,23 @@ def _month_actual(row: dict) -> MonthActual:
         bank_out=int(row["bankOut"]),
         card_paid=int(row.get("cardPaid") or 0),
         vat_paid=int(row.get("vatPaid") or 0),
+        bank_out_lines=_line_pairs(row.get("bankOutLines")),
+        bank_in_lines=_line_pairs(row.get("bankInLines")),
     )
+
+
+def _line_pairs(lines: object) -> tuple[tuple[str, int], ...]:
+    if not isinstance(lines, list):
+        return ()
+    pairs = []
+    for item in lines:
+        if not isinstance(item, dict):
+            continue
+        amount = item.get("amount")
+        if isinstance(amount, bool) or not isinstance(amount, int) or amount <= 0:
+            continue
+        pairs.append((str(item.get("name") or "미분류"), amount))
+    return tuple(pairs)
 
 
 def _sale(item: dict) -> PlannedSale:
