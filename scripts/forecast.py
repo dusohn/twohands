@@ -27,6 +27,8 @@ class MonthActual:
     bank_out: int
     card_paid: int
     vat_paid: int = 0
+    bank_out_lines: tuple[tuple[str, int], ...] = ()
+    bank_in_lines: tuple[tuple[str, int], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -147,7 +149,14 @@ def build_forecast(
         plan_supply, plan_gross = _plan_amounts(booked, key, row.sales)
         expense_supply, expense_gross = _expense_amounts(booked_expenses, key)
         end_cash = cash_now - remaining_bill - unpaid_vat + plan_gross - expense_gross
-        income, expense = _bank_lines(row.bank_in, row.bank_out, row.card_paid, row.vat_paid)
+        income, expense = _bank_lines(
+            row.bank_in,
+            row.bank_out,
+            row.card_paid,
+            row.vat_paid,
+            row.bank_out_lines,
+            row.bank_in_lines,
+        )
         income.extend(_sale_lines(booked, key, row.sales))
         if remaining_bill:
             expense.append({"name": "카드 대금", "amount": remaining_bill, "note": "지난달 사용분"})
@@ -330,19 +339,44 @@ def _won(amount: int) -> str:
     return f"{amount:,}"
 
 
-def _bank_lines(bank_in: int, bank_out: int, card_paid: int, vat_paid: int) -> tuple[list[dict], list[dict]]:
-    income = [{"name": "통장 입금", "amount": bank_in, "note": "이미 입금"}] if bank_in else []
-    paid_card = min(max(card_paid, 0), max(bank_out, 0))
-    paid_vat = min(max(vat_paid, 0), max(bank_out - paid_card, 0))
-    other = bank_out - paid_card - paid_vat
-    expense = []
-    if paid_card:
-        expense.append({"name": "카드 대금", "amount": paid_card, "note": "이미 출금"})
-    if paid_vat:
-        expense.append({"name": "부가세 납부", "amount": paid_vat, "note": "이미 출금"})
-    if other:
-        expense.append({"name": "기타 통장 출금", "amount": other, "note": "이미 출금"})
+def _bank_lines(
+    bank_in: int,
+    bank_out: int,
+    card_paid: int,
+    vat_paid: int,
+    bank_out_lines: tuple[tuple[str, int], ...] = (),
+    bank_in_lines: tuple[tuple[str, int], ...] = (),
+) -> tuple[list[dict], list[dict]]:
+    if bank_in_lines:
+        income = _category_lines(bank_in_lines, bank_in, "통장 입금")
+    else:
+        income = [{"name": "통장 입금", "amount": bank_in, "note": "통장 입금"}] if bank_in else []
+    if bank_out_lines:
+        expense = _category_lines(bank_out_lines, bank_out, "통장 출금")
+    else:
+        paid_card = min(max(card_paid, 0), max(bank_out, 0))
+        paid_vat = min(max(vat_paid, 0), max(bank_out - paid_card, 0))
+        other = bank_out - paid_card - paid_vat
+        expense = _category_lines(
+            (
+                ("신용/체크카드결제", paid_card),
+                ("부가세납부", paid_vat),
+                ("기타", other),
+            ),
+            bank_out,
+            "통장 출금",
+        )
     return income, expense
+
+
+def _category_lines(lines: tuple[tuple[str, int], ...] | list, total: int, note: str) -> list[dict]:
+    """Bank categories, largest first. A remainder keeps the detail equal to the month total."""
+    ranked = sorted(((str(name), int(amount)) for name, amount in lines if int(amount) > 0), key=lambda item: (-item[1], item[0]))
+    result = [{"name": name, "amount": amount, "note": note} for name, amount in ranked]
+    used = sum(item["amount"] for item in result)
+    if total > used:
+        result.append({"name": "기타", "amount": total - used, "note": note})
+    return result
 
 
 def _sale_lines(plans: list[PlannedSale], key: tuple[int, int], already_sales: int = 0) -> list[dict]:
@@ -378,7 +412,14 @@ def _expense_lines(expenses: list[PlannedExpense], key: tuple[int, int]) -> list
 
 
 def _actual_row(row: MonthActual) -> dict:
-    income, expense = _bank_lines(row.bank_in, row.bank_out, row.card_paid, row.vat_paid)
+    income, expense = _bank_lines(
+        row.bank_in,
+        row.bank_out,
+        row.card_paid,
+        row.vat_paid,
+        row.bank_out_lines,
+        row.bank_in_lines,
+    )
     return {
         "year": row.year,
         "month": row.month,

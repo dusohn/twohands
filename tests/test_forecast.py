@@ -15,8 +15,8 @@ from forecast import (
 )
 
 
-def month(year, month, sales=0, purchase=0, card=0, bank_in=0, bank_out=0, card_paid=0, vat_paid=0):
-    return MonthActual(year, month, sales, purchase, card, bank_in, bank_out, card_paid, vat_paid)
+def month(year, month, sales=0, purchase=0, card=0, bank_in=0, bank_out=0, card_paid=0, vat_paid=0, bank_out_lines=()):
+    return MonthActual(year, month, sales, purchase, card, bank_in, bank_out, card_paid, vat_paid, bank_out_lines)
 
 
 class ForecastTest(unittest.TestCase):
@@ -105,6 +105,35 @@ class ForecastTest(unittest.TestCase):
         self.assertEqual(octobers[0]["status"], "실제")
         self.assertEqual(octobers[0]["bankOut"], 6_635_391)
         self.assertEqual(octobers[0]["endCash"], 26_965_137)
+        self.assertEqual(
+            octobers[0]["expense"],
+            [
+                {"name": "부가세납부", "amount": 3_542_780, "note": "통장 출금"},
+                {"name": "신용/체크카드결제", "amount": 3_088_141, "note": "통장 출금"},
+                {"name": "기타", "amount": 4_470, "note": "통장 출금"},
+            ],
+        )
+        self.assertTrue(all("예상" not in line["note"] for line in octobers[0]["expense"]))
+        categorized = build_forecast(
+            [
+                month(
+                    2026,
+                    10,
+                    bank_out=6_635_391,
+                    bank_out_lines=(("부가세납부", 3_542_780), ("신용/체크카드결제", 3_088_141), ("수수료", 4_470)),
+                )
+            ],
+            date(2026, 10, 31),
+            26_965_137,
+            [],
+            expenses=[PlannedExpense(2026, 10, 30, 4_500_000, "침대구입")],
+        )
+        closed = categorized["rows"][0]
+        self.assertEqual(
+            [line["name"] for line in closed["expense"]],
+            ["부가세납부", "신용/체크카드결제", "수수료"],
+        )
+        self.assertEqual(closed["bankOut"], 6_635_391)
         november = next(row for row in forecast["rows"] if row["month"] == 11)
         self.assertEqual(november["bankOut"], 2_690_268 + 4_950_000)
         self.assertEqual(november["endCash"], 26_965_137 - november["bankOut"] + 61_600_000)
@@ -172,14 +201,14 @@ class ForecastTest(unittest.TestCase):
         self.assertEqual(
             by[(2026, 9)]["expense"],
             [
-                {"name": "카드 대금", "amount": 7_456_887, "note": "이미 출금"},
-                {"name": "기타 통장 출금", "amount": 5_530, "note": "이미 출금"},
+                {"name": "신용/체크카드결제", "amount": 7_456_887, "note": "통장 출금"},
+                {"name": "기타", "amount": 5_530, "note": "통장 출금"},
             ],
         )
         self.assertEqual(
             by[(2026, 10)]["expense"],
             [
-                {"name": "부가세 납부", "amount": 3_542_780, "note": "이미 출금"},
+                {"name": "부가세납부", "amount": 3_542_780, "note": "통장 출금"},
                 {"name": "카드 대금", "amount": 2_949_981, "note": "지난달 사용분"},
                 {"name": "침대구입", "amount": 4_950_000, "note": "30일 · 공급가 4,500,000원 · 부가세 450,000원"},
             ],

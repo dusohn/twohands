@@ -54,7 +54,12 @@ function ym(year, month) {
 }
 
 function rowsForYear(data, year) {
-  const found = new Map(data.rows.filter((row) => row.year === year).map((row) => [row.month, row]));
+  const found = new Map();
+  for (const row of data.rows) {
+    if (row.year !== year) continue;
+    const current = found.get(row.month);
+    if (!current || row.status === "실제" || current.status !== "실제") found.set(row.month, row);
+  }
   return Array.from({ length: 12 }, (_, index) => {
     const month = index + 1;
     return (
@@ -397,7 +402,7 @@ function renderDetail(data, rows) {
       .join("")}</div>
     <div class="cf-card">
       <h2>${row.year}년 ${row.month}월 수입·지출 ${statusBadge(row.status, row.endCash)}</h2>
-      <p class="cf-note">수입은 그 달 통장 입금이고, 지출은 그 달 통장 출금입니다. 예정 매출과 예정 지출은 공급가액에 부가세 10%를 더한 총액입니다. 이미 나간 금액은 잔고에 반영되어 있습니다.</p>
+      <p class="cf-note">${row.status === "실제" ? "지난 달은 통장에 기록된 입금과 출금만 보여 줍니다. 상세 지출은 은행 계좌 분류별로 모은 금액이고, 예상은 넣지 않습니다." : "앞으로의 달은 예정 매출, 예정 지출, 예상 카드 대금을 포함합니다. 예정 금액은 공급가액에 부가세 10%를 더한 총액입니다."}</p>
       <div class="kpis">
         <div class="kpi"><div class="k">수입</div><div class="v pos">${fmt(row.bankIn)}원</div></div>
         <div class="kpi"><div class="k">지출</div><div class="v neg">${fmt(-row.bankOut)}원</div></div>
@@ -406,8 +411,8 @@ function renderDetail(data, rows) {
       </div>
     </div>
     <div class="detail-grid">
-      ${detailTable("수입", income, row.bankIn, 1)}
-      ${detailTable("지출", expense, row.bankOut, -1)}
+      ${detailTable(row.status === "실제" ? "통장 입금" : "수입", income, row.bankIn, 1)}
+      ${detailTable(row.status === "실제" ? "상세 지출" : "지출", expense, row.bankOut, -1)}
     </div>`;
 }
 
