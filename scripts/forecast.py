@@ -170,11 +170,14 @@ def build_forecast(
             }
         )
 
+    if month_complete:
+        rows[-1]["endCash"] = cash_now
     cash = rows[-1]["endCash"]
     bill = anchor_card
     spend = base
     end_key = _key(as_of.year + horizon_years, 12)
-    cursor = current if month_complete else _add_month(as_of.year, as_of.month, 1)
+    # A finished month is already an actual row. Its card bill leaves next month.
+    cursor = _add_month(as_of.year, as_of.month, 1)
     guard = _key(as_of.year + horizon_years + 6, 12)
     while cursor <= guard:
         plan_supply, plan_gross = _plan_amounts(booked, cursor, already_sales=0)

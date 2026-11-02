@@ -77,6 +77,37 @@ class ForecastTest(unittest.TestCase):
         november = forecast["rows"][0]
         self.assertEqual(november["status"], "실제")
         self.assertEqual(november["sales"], 56_000_000)
+        self.assertEqual(november["endCash"], 80_000_000)
+        self.assertEqual(sum(1 for row in forecast["rows"] if (row["year"], row["month"]) == (2026, 11)), 1)
+
+    def test_closed_october_keeps_the_bank_balance(self):
+        actuals = [
+            month(2026, 9, card=2_949_981),
+            month(
+                2026,
+                10,
+                card=2_690_268,
+                bank_in=29_135,
+                bank_out=6_635_391,
+                card_paid=3_088_141,
+                vat_paid=3_542_780,
+            ),
+        ]
+        forecast = build_forecast(
+            actuals,
+            date(2026, 10, 31),
+            26_965_137,
+            [PlannedSale(2026, 11, 30, 56_000_000, "부가세 별도, 월말 입금")],
+            expenses=[PlannedExpense(2026, 11, 30, 4_500_000, "침대구입")],
+        )
+        octobers = [row for row in forecast["rows"] if (row["year"], row["month"]) == (2026, 10)]
+        self.assertEqual(len(octobers), 1)
+        self.assertEqual(octobers[0]["status"], "실제")
+        self.assertEqual(octobers[0]["bankOut"], 6_635_391)
+        self.assertEqual(octobers[0]["endCash"], 26_965_137)
+        november = next(row for row in forecast["rows"] if row["month"] == 11)
+        self.assertEqual(november["bankOut"], 2_690_268 + 4_950_000)
+        self.assertEqual(november["endCash"], 26_965_137 - november["bankOut"] + 61_600_000)
 
     def test_output_vat_is_paid_in_january_april_july_october(self):
         self.assertEqual(vat_due(2026, 2), (2026, 4))
