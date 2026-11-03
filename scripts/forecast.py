@@ -114,21 +114,13 @@ def build_forecast(
     days = calendar.monthrange(as_of.year, as_of.month)[1]
     month_complete = as_of.day >= days
     current_row = by_month[current]
-    if month_complete or as_of.day <= 0:
-        card_run_rate = current_row.card
-    else:
-        card_run_rate = half_up(Decimal(current_row.card) / Decimal(as_of.day) * Decimal(days))
-
     previous = _add_month(as_of.year, as_of.month, -1)
     last_full_card = by_month[previous].card if previous in by_month else 0
-    if month_complete:
-        earlier = _add_month(previous[0], previous[1], -1)
-        earlier_card = by_month[earlier].card if earlier in by_month else last_full_card
-        base = half_up(Decimal(earlier_card + current_row.card) / Decimal(2))
-        anchor_card = current_row.card
-    else:
-        base = half_up(Decimal(last_full_card + card_run_rate) / Decimal(2))
-        anchor_card = card_run_rate
+    # Forecast card spend is the average of the last three finished months.
+    # A finished month's own card is already known and is paid the next month.
+    history_end = current if month_complete else previous
+    base = _average_recent_card(by_month, history_end)
+    anchor_card = current_row.card if month_complete else max(current_row.card, base)
 
     booked = _booked_plans(plans, by_month, as_of, month_complete)
     booked_expenses = _open_expenses(expenses or [], as_of, month_complete)
@@ -170,7 +162,7 @@ def build_forecast(
                 "status": "예정" if plan_supply or expense_supply else "진행",
                 "sales": row.sales + plan_supply,
                 "purchase": row.purchase + expense_supply,
-                "card": card_run_rate,
+                "card": anchor_card,
                 "bankIn": row.bank_in + plan_gross,
                 "bankOut": row.bank_out + remaining_bill + unpaid_vat + expense_gross,
                 "endCash": end_cash,
@@ -229,6 +221,21 @@ def build_forecast(
         "depletion": depletion,
         "rows": rows,
     }
+
+
+def _average_recent_card(by_month: dict[tuple[int, int], MonthActual], end: tuple[int, int]) -> int:
+    """Half-up average of card spend in up to three finished months ending at `end`."""
+    amounts: list[int] = []
+    cursor = end
+    for _ in range(3):
+        row = by_month.get(cursor)
+        if row is None:
+            break
+        amounts.append(row.card)
+        cursor = _add_month(cursor[0], cursor[1], -1)
+    if not amounts:
+        return 0
+    return half_up(Decimal(sum(amounts)) / Decimal(len(amounts)))
 
 
 def _vat_still_due(
