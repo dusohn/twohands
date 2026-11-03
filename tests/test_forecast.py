@@ -40,31 +40,62 @@ class ForecastTest(unittest.TestCase):
         ]
         forecast = build_forecast(actuals, date(2026, 10, 12), 33_571_393, plans)
         apply_actual_balances(forecast["rows"], balances)
-        self.assertEqual(forecast["currentMonthCard"], 4_204_620)
-        self.assertEqual(forecast["baseExpense"], 3_577_301)
+        self.assertEqual(forecast["currentMonthCard"], 3_380_402)
+        self.assertEqual(forecast["baseExpense"], 3_380_402)
         by = {(row["year"], row["month"]): row for row in forecast["rows"]}
         self.assertEqual(by[(2026, 8)]["sales"], 42_000_000)
         self.assertEqual(by[(2026, 8)]["endCash"], 40_997_862)
         self.assertEqual(by[(2026, 9)]["status"], "실제")
         self.assertEqual(by[(2026, 10)]["status"], "진행")
-        self.assertEqual(by[(2026, 10)]["card"], 4_204_620)
+        self.assertEqual(by[(2026, 10)]["card"], 3_380_402)
         self.assertEqual(by[(2026, 10)]["bankOut"], 7_149_981)
         self.assertEqual(by[(2026, 10)]["endCash"], 26_421_412)
         self.assertEqual(by[(2026, 11)]["status"], "예정")
         self.assertEqual(by[(2026, 11)]["bankIn"], 61_600_000)
-        self.assertEqual(by[(2026, 11)]["bankOut"], 4_204_620)
-        self.assertEqual(by[(2026, 11)]["endCash"], 83_816_792)
-        self.assertEqual(by[(2026, 12)]["endCash"], 80_239_491)
-        self.assertEqual(by[(2027, 1)]["bankOut"], 9_177_301)
-        self.assertEqual(by[(2027, 1)]["endCash"], 71_062_190)
+        self.assertEqual(by[(2026, 11)]["bankOut"], 3_380_402)
+        self.assertEqual(by[(2026, 11)]["endCash"], 84_641_010)
+        self.assertEqual(by[(2026, 12)]["endCash"], 81_260_608)
+        self.assertEqual(by[(2027, 1)]["bankOut"], 8_980_402)
+        self.assertEqual(by[(2027, 1)]["endCash"], 72_280_206)
         self.assertEqual(by[(2027, 4)]["bankIn"], 46_200_000)
-        self.assertEqual(by[(2027, 4)]["bankOut"], 3_577_301)
-        self.assertEqual(by[(2027, 4)]["endCash"], 106_530_287)
-        self.assertEqual(by[(2027, 7)]["bankOut"], 7_777_301)
-        self.assertEqual(by[(2027, 7)]["endCash"], 91_598_384)
-        self.assertEqual(by[(2029, 8)]["endCash"], 2_165_859)
-        self.assertEqual(by[(2029, 9)]["endCash"], -1_411_442)
-        self.assertEqual(forecast["depletion"], {"year": 2029, "month": 9, "day": 18})
+        self.assertEqual(by[(2027, 4)]["bankOut"], 3_380_402)
+        self.assertEqual(by[(2027, 4)]["endCash"], 108_339_000)
+        self.assertEqual(by[(2027, 7)]["bankOut"], 7_580_402)
+        self.assertEqual(by[(2027, 7)]["endCash"], 93_997_794)
+        self.assertEqual(by[(2029, 10)]["endCash"], 2_726_940)
+        self.assertEqual(by[(2029, 11)]["endCash"], -653_462)
+        self.assertEqual(forecast["depletion"], {"year": 2029, "month": 11, "day": 24})
+
+    def test_forecast_card_uses_the_average_of_the_last_three_actual_months(self):
+        actuals = [
+            month(2026, 8, card=7_191_225),
+            month(2026, 9, card=2_949_981),
+            month(2026, 10, card=3_050_668),
+            month(2026, 11, card=6_323_300),
+        ]
+        forecast = build_forecast(actuals, date(2026, 11, 2), 26_965_137, [])
+        self.assertEqual(forecast["baseExpense"], 4_397_291)
+        self.assertEqual(forecast["currentMonthCard"], 6_323_300)
+        by = {(row["year"], row["month"]): row for row in forecast["rows"]}
+        self.assertEqual(by[(2026, 11)]["card"], 6_323_300)
+        self.assertEqual(by[(2026, 12)]["card"], 4_397_291)
+        self.assertEqual(by[(2026, 12)]["bankOut"], 6_323_300)
+        self.assertEqual(by[(2027, 1)]["bankOut"], 4_397_291)
+
+        below = build_forecast(
+            [
+                month(2026, 8, card=7_191_225),
+                month(2026, 9, card=2_949_981),
+                month(2026, 10, card=3_050_668),
+                month(2026, 11, card=100_000),
+            ],
+            date(2026, 11, 2),
+            26_965_137,
+            [],
+        )
+        self.assertEqual(below["currentMonthCard"], 4_397_291)
+        december = next(row for row in below["rows"] if (row["year"], row["month"]) == (2026, 12))
+        self.assertEqual(december["bankOut"], 4_397_291)
 
     def test_booked_sale_is_not_added_twice(self):
         actuals = [month(2026, 11, sales=56_000_000, card=3_000_000, bank_in=61_600_000)]
@@ -175,7 +206,7 @@ class ForecastTest(unittest.TestCase):
         by = {(row["year"], row["month"]): row for row in forecast["rows"]}
         self.assertEqual(by[(2026, 10)]["bankOut"], 11_442_761)
         self.assertEqual(by[(2026, 10)]["endCash"], 22_128_632)
-        self.assertEqual(by[(2027, 1)]["bankOut"], 8_664_645)
+        self.assertEqual(by[(2027, 1)]["bankOut"], 7_074_991)
 
     def test_month_lines_match_cash_and_name_october_vat(self):
         actuals = [
@@ -223,7 +254,7 @@ class ForecastTest(unittest.TestCase):
                 }
             ],
         )
-        self.assertEqual(by[(2026, 11)]["expense"], [{"name": "카드 대금", "amount": 3_179_308, "note": "예상"}])
+        self.assertEqual(by[(2026, 11)]["expense"], [{"name": "카드 대금", "amount": 2_563_958, "note": "예상"}])
         self.assertEqual(
             by[(2026, 12)]["expense"][1],
             {"name": "현탁 핸드폰", "amount": 1_980_000, "note": "25일 · 공급가 1,800,000원 · 부가세 180,000원"},
