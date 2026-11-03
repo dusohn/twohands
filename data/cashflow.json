@@ -2,7 +2,7 @@
   "company": "주식회사 투핸즈",
   "source": "자비스",
   "asOf": "2026-11-02",
-  "updatedAt": "2026-11-03T13:53:53+09:00",
+  "updatedAt": "2026-11-03T14:23:09+09:00",
   "currency": "KRW",
   "cashNow": 26965137,
   "baseExpense": 4397291,
@@ -10,7 +10,7 @@
   "monthComplete": false,
   "depletion": {
     "year": 2028,
-    "month": 3,
+    "month": 8,
     "day": 22
   },
   "plans": [
@@ -38,12 +38,12 @@
     },
     {
       "date": "2027-08-31",
-      "supply": 20000000,
+      "supply": 10000000,
       "note": "가족여행"
     },
     {
       "date": "2028-01-31",
-      "supply": 20000000,
+      "supply": 10000000,
       "note": "가족여행"
     }
   ],
@@ -741,11 +741,11 @@
       "month": 8,
       "status": "예정",
       "sales": 0,
-      "purchase": 20000000,
+      "purchase": 10000000,
       "card": 4397291,
       "bankIn": 0,
-      "bankOut": 26397291,
-      "endCash": 51482841,
+      "bankOut": 15397291,
+      "endCash": 62482841,
       "income": [],
       "expense": [
         {
@@ -755,8 +755,8 @@
         },
         {
           "name": "가족여행",
-          "amount": 22000000,
-          "note": "31일 · 공급가 20,000,000원 · 부가세 2,000,000원"
+          "amount": 11000000,
+          "note": "31일 · 공급가 10,000,000원 · 부가세 1,000,000원"
         }
       ]
     },
@@ -769,7 +769,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": 47085550,
+      "endCash": 58085550,
       "income": [],
       "expense": [
         {
@@ -788,7 +788,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": 42688259,
+      "endCash": 53688259,
       "income": [],
       "expense": [
         {
@@ -807,7 +807,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": 38290968,
+      "endCash": 49290968,
       "income": [],
       "expense": [
         {
@@ -826,7 +826,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": 33893677,
+      "endCash": 44893677,
       "income": [],
       "expense": [
         {
@@ -841,11 +841,11 @@
       "month": 1,
       "status": "예정",
       "sales": 0,
-      "purchase": 20000000,
+      "purchase": 10000000,
       "card": 4397291,
       "bankIn": 0,
-      "bankOut": 26397291,
-      "endCash": 7496386,
+      "bankOut": 15397291,
+      "endCash": 29496386,
       "income": [],
       "expense": [
         {
@@ -855,8 +855,8 @@
         },
         {
           "name": "가족여행",
-          "amount": 22000000,
-          "note": "31일 · 공급가 20,000,000원 · 부가세 2,000,000원"
+          "amount": 11000000,
+          "note": "31일 · 공급가 10,000,000원 · 부가세 1,000,000원"
         }
       ]
     },
@@ -869,7 +869,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": 3099095,
+      "endCash": 25099095,
       "income": [],
       "expense": [
         {
@@ -888,7 +888,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -1298196,
+      "endCash": 20701804,
       "income": [],
       "expense": [
         {
@@ -907,7 +907,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -5695487,
+      "endCash": 16304513,
       "income": [],
       "expense": [
         {
@@ -926,7 +926,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -10092778,
+      "endCash": 11907222,
       "income": [],
       "expense": [
         {
@@ -945,7 +945,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -14490069,
+      "endCash": 7509931,
       "income": [],
       "expense": [
         {
@@ -964,7 +964,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -18887360,
+      "endCash": 3112640,
       "income": [],
       "expense": [
         {
@@ -983,7 +983,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -23284651,
+      "endCash": -1284651,
       "income": [],
       "expense": [
         {
@@ -1002,7 +1002,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -27681942,
+      "endCash": -5681942,
       "income": [],
       "expense": [
         {
@@ -1021,7 +1021,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -32079233,
+      "endCash": -10079233,
       "income": [],
       "expense": [
         {
@@ -1040,7 +1040,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -36476524,
+      "endCash": -14476524,
       "income": [],
       "expense": [
         {
@@ -1059,7 +1059,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -40873815,
+      "endCash": -18873815,
       "income": [],
       "expense": [
         {
@@ -1078,7 +1078,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -45271106,
+      "endCash": -23271106,
       "income": [],
       "expense": [
         {
@@ -1097,7 +1097,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -49668397,
+      "endCash": -27668397,
       "income": [],
       "expense": [
         {
@@ -1116,7 +1116,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -54065688,
+      "endCash": -32065688,
       "income": [],
       "expense": [
         {
@@ -1135,7 +1135,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -58462979,
+      "endCash": -36462979,
       "income": [],
       "expense": [
         {
@@ -1154,7 +1154,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -62860270,
+      "endCash": -40860270,
       "income": [],
       "expense": [
         {
@@ -1173,7 +1173,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -67257561,
+      "endCash": -45257561,
       "income": [],
       "expense": [
         {
@@ -1192,7 +1192,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -71654852,
+      "endCash": -49654852,
       "income": [],
       "expense": [
         {
@@ -1211,7 +1211,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -76052143,
+      "endCash": -54052143,
       "income": [],
       "expense": [
         {
@@ -1230,7 +1230,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -80449434,
+      "endCash": -58449434,
       "income": [],
       "expense": [
         {
@@ -1249,7 +1249,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -84846725,
+      "endCash": -62846725,
       "income": [],
       "expense": [
         {
@@ -1268,7 +1268,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -89244016,
+      "endCash": -67244016,
       "income": [],
       "expense": [
         {
@@ -1287,7 +1287,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -93641307,
+      "endCash": -71641307,
       "income": [],
       "expense": [
         {
