@@ -2,7 +2,7 @@
   "company": "주식회사 투핸즈",
   "source": "자비스",
   "asOf": "2026-11-03",
-  "updatedAt": "2026-11-04T08:34:52+09:00",
+  "updatedAt": "2026-11-04T08:42:36+09:00",
   "currency": "KRW",
   "cashNow": 26965137,
   "baseExpense": 4397291,
@@ -10,8 +10,8 @@
   "monthComplete": false,
   "depletion": {
     "year": 2029,
-    "month": 10,
-    "day": 11
+    "month": 8,
+    "day": 21
   },
   "plans": [
     {
@@ -48,6 +48,11 @@
     },
     {
       "date": "2028-08-31",
+      "supply": 10000000,
+      "note": "가족여행"
+    },
+    {
+      "date": "2029-08-31",
       "supply": 10000000,
       "note": "가족여행"
     }
@@ -1221,19 +1226,24 @@
     {
       "year": 2029,
       "month": 8,
-      "status": "예상",
+      "status": "예정",
       "sales": 0,
-      "purchase": 0,
+      "purchase": 10000000,
       "card": 4397291,
       "bankIn": 0,
-      "bankOut": 4397291,
-      "endCash": 5947857,
+      "bankOut": 15397291,
+      "endCash": -5052143,
       "income": [],
       "expense": [
         {
           "name": "카드 대금",
           "amount": 4397291,
           "note": "예상"
+        },
+        {
+          "name": "가족여행",
+          "amount": 11000000,
+          "note": "31일 · 공급가 10,000,000원 · 부가세 1,000,000원"
         }
       ]
     },
@@ -1246,7 +1256,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": 1550566,
+      "endCash": -9449434,
       "income": [],
       "expense": [
         {
@@ -1265,7 +1275,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -2846725,
+      "endCash": -13846725,
       "income": [],
       "expense": [
         {
@@ -1284,7 +1294,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -7244016,
+      "endCash": -18244016,
       "income": [],
       "expense": [
         {
@@ -1303,7 +1313,7 @@
       "card": 4397291,
       "bankIn": 0,
       "bankOut": 4397291,
-      "endCash": -11641307,
+      "endCash": -22641307,
       "income": [],
       "expense": [
         {
