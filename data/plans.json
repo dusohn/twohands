@@ -14,11 +14,6 @@
       "date": "2027-10-31",
       "supply": 50000000,
       "note": "MES"
-    },
-    {
-      "date": "2028-01-31",
-      "supply": 24000000,
-      "note": "NRV"
     }
   ],
   "expenses": [
