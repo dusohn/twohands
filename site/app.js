@@ -432,8 +432,9 @@ function renderCards(data) {
     : '<tr><td colspan="3" class="empty">카드 구성이 없습니다.</td></tr>';
   return `
     <div class="cf-card">
-      <h2>${esc(data.cardMixMonth || "")} 카드 구성 <span class="file-tag">자비스 카드매입</span></h2>
-      <p class="cf-note">지난달 승인 금액입니다. 취소는 제외하고, 해외 결제는 원화 환산 금액을 씁니다.</p>
+      <h2>${esc(data.cardMixMonth || "")} 카드 구성 <span class="file-tag">${esc(data.cardMixSource || "자비스 카드매입")}</span></h2>
+      <p class="cf-note">${(data.cardMixMonth || "") === String(data.asOf || "").slice(0, 7) ? "이번 달 이용 금액입니다." : "지난달 승인 금액입니다."} 취소는 제외하고, 해외 결제는 원화 환산 금액을 씁니다.</p>
+      ${data.cardMixNote ? `<p class="cf-note">${esc(data.cardMixNote)}</p>` : ""}
       <div class="tbl-wrap"><table class="cf">
         <tr><th style="text-align:left">분류</th><th class="num">금액</th><th class="num">비중</th></tr>
         ${body}
@@ -451,7 +452,7 @@ function render(data) {
   const updated = String(data.updatedAt || "").replace("T", " ").replace("+09:00", " KST");
   const root = document.getElementById("cfApp");
   root.innerHTML = `
-    <div class="cf-head"><h1>TWOHANDS Cashflow</h1><span class="sub">12개월 현금흐름 전망 · 자비스 ${esc(data.asOf)}</span>
+    <div class="cf-head"><h1>TWOHANDS Cashflow</h1><span class="sub">12개월 현금흐름 전망 · ${esc(data.source || "자비스")} ${esc(data.asOf)}</span>
       <span class="sub" id="syncBadge" style="margin-left:auto">갱신 ${esc(updated)}</span></div>
     <div class="cf-tabs">${TABS.map(
       ([key, label]) =>
