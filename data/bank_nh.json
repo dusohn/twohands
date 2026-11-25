@@ -1,0 +1,24 @@
+{
+  "account": "****6481",
+  "queriedAt": "2026-11-25T13:43:24+09:00",
+  "balance": 88114537,
+  "available": 88114537,
+  "transactions": [
+    {
+      "datetime": "2026-11-18T20:03:16+09:00",
+      "deposit": 61600000,
+      "withdrawal": 0,
+      "balanceAfter": 88114537,
+      "description": "E-하나은행",
+      "memo": "(주)더린킨"
+    },
+    {
+      "datetime": "2026-11-17T08:42:30+09:00",
+      "deposit": 0,
+      "withdrawal": 450600,
+      "balanceAfter": 26514537,
+      "description": "실시간이체",
+      "memo": "현대카드"
+    }
+  ]
+}

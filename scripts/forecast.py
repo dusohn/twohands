@@ -1,4 +1,4 @@
-"""Cashflow forecast from Jobis month totals.
+"""Cashflow forecast from monthly totals.
 
 Amounts are integer won. Divisions use half-up rounding, the same rule as
 Math.round for positive numbers.

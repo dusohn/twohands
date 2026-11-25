@@ -98,7 +98,7 @@ class JobisClient:
         )
         if status != 200:
             raise RuntimeError(f"{path} returned HTTP {status}")
-        return json.loads(body.decode() or "{}")
+        return _parse_json_body(path, body)
 
     def _post_form(self, path: str, form: dict) -> dict:
         status, body, _ = self._open(
@@ -111,7 +111,7 @@ class JobisClient:
         )
         if status != 200:
             raise RuntimeError(f"{path} returned HTTP {status}")
-        parsed = json.loads(body.decode() or "{}")
+        parsed = _parse_json_body(path, body)
         if parsed.get("result") is False:
             raise RuntimeError(f"{path} returned result=false")
         return parsed
@@ -123,7 +123,7 @@ class JobisClient:
         )
         if status != 200:
             raise RuntimeError(f"{path} returned HTTP {status}")
-        parsed = json.loads(body.decode() or "{}")
+        parsed = _parse_json_body(path, body)
         if parsed.get("result") is False:
             raise RuntimeError(f"{path} returned result=false")
         return parsed
@@ -138,6 +138,17 @@ class JobisClient:
         request = urllib.request.Request(url, data=data, headers=header_map)
         with self.opener.open(request, timeout=60) as response:
             return response.status, response.read(), response.headers
+
+
+def _parse_json_body(path: str, body: bytes) -> dict:
+    """An empty dashboard body is the Jobis outage seen since 2026-11-06."""
+    text = body.decode()
+    if not text.strip():
+        raise json.JSONDecodeError("Empty Jobis response", text, 0)
+    parsed = json.loads(text)
+    if not isinstance(parsed, dict):
+        raise RuntimeError(f"{path} returned unexpected JSON")
+    return parsed
 
 
 def _as_of(hit: dict, today: date) -> date:

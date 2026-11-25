@@ -1,4 +1,4 @@
-name: 자비스 현금흐름 갱신
+name: 현금흐름 갱신
 
 on:
   workflow_dispatch:
@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Read Jobis and rewrite the cashflow
+      - name: Read the NH account and Jobis cards
         env:
           JOBIS_EMAIL: ${{ secrets.JOBIS_EMAIL }}
           JOBIS_PASSWORD: ${{ secrets.JOBIS_PASSWORD }}
@@ -34,6 +34,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "cashflow.json unchanged"
           else
-            git commit -m "Update cashflow from Jobis"
+            git commit -m "Update cashflow from the NH account"
             git push
           fi
