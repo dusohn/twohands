@@ -1,9 +1,25 @@
 {
   "account": "****6481",
-  "queriedAt": "2026-11-25T13:43:24+09:00",
-  "balance": 88114537,
-  "available": 88114537,
+  "queriedAt": "2026-11-26T06:44:39+09:00",
+  "balance": 79172844,
+  "available": 79172844,
   "transactions": [
+    {
+      "datetime": "2026-11-25T19:31:11+09:00",
+      "deposit": 0,
+      "withdrawal": 8919693,
+      "balanceAfter": 79172844,
+      "description": "카드대금",
+      "memo": "현대카드대금"
+    },
+    {
+      "datetime": "2026-11-25T17:14:12+09:00",
+      "deposit": 0,
+      "withdrawal": 22000,
+      "balanceAfter": 88092537,
+      "description": "NH카드대금",
+      "memo": "NH기업카드"
+    },
     {
       "datetime": "2026-11-18T20:03:16+09:00",
       "deposit": 61600000,
