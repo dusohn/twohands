@@ -5,6 +5,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
+from decimal import Decimal
+
 from forecast import (
     MonthActual,
     PlannedExpense,
@@ -12,6 +14,7 @@ from forecast import (
     TimeDeposit,
     apply_actual_balances,
     build_forecast,
+    time_deposit_interest,
     vat_due,
 )
 
@@ -319,6 +322,42 @@ class ForecastTest(unittest.TestCase):
         self.assertEqual(matured["income"][0]["amount"], 50_000_000)
         october = next(row for row in forecast["rows"] if row["year"] == 2027 and row["month"] == 10)
         self.assertEqual(matured["endCash"], october["endCash"] - matured["bankOut"] + 50_000_000)
+
+    def test_time_deposit_interest_uses_one_year_simple_rate_and_15_4_percent_tax(self):
+        self.assertEqual(time_deposit_interest(50_000_000, Decimal("3.63")), (1_815_000, 279_510, 1_535_490))
+        actuals = [
+            month(2026, 10, card=3_000_000),
+            month(2026, 11, card=3_000_000, bank_out=200_000, card_paid=200_000),
+        ]
+        gross, tax, net = time_deposit_interest(50_000_000, Decimal("3.63"))
+        forecast = build_forecast(
+            actuals,
+            date(2026, 11, 26),
+            29_000_000,
+            [],
+            time_deposits=[
+                TimeDeposit(
+                    50_000_000,
+                    date(2026, 11, 26),
+                    date(2027, 11, 25),
+                    "정기예금",
+                    Decimal("3.63"),
+                    gross,
+                    tax,
+                    net,
+                ),
+            ],
+        )
+        matured = next(row for row in forecast["rows"] if row["year"] == 2027 and row["month"] == 11)
+        self.assertEqual(matured["bankIn"], 51_535_490)
+        self.assertEqual(matured["income"][0]["name"], "정기예금")
+        self.assertEqual(matured["income"][0]["amount"], 50_000_000)
+        self.assertEqual(matured["income"][1]["name"], "정기예금 이자(세후)")
+        self.assertEqual(matured["income"][1]["amount"], 1_535_490)
+        self.assertIn("1,815,000", matured["income"][1]["note"])
+        self.assertIn("279,510", matured["income"][1]["note"])
+        october = next(row for row in forecast["rows"] if row["year"] == 2027 and row["month"] == 10)
+        self.assertEqual(matured["endCash"], october["endCash"] - matured["bankOut"] + 51_535_490)
 
 if __name__ == "__main__":
     unittest.main()

@@ -10,6 +10,7 @@ bank. Credentials stay in the environment and are never written to the repo.
 from __future__ import annotations
 
 import json
+from decimal import Decimal
 import os
 import re
 import sys
@@ -20,12 +21,21 @@ from zoneinfo import ZoneInfo
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from forecast import MonthActual, PlannedExpense, PlannedSale, TimeDeposit, apply_actual_balances, build_forecast
+from forecast import (
+    MonthActual,
+    PlannedExpense,
+    PlannedSale,
+    TimeDeposit,
+    apply_actual_balances,
+    build_forecast,
+    time_deposit_interest,
+)
 from jobis_client import JobisClient
 
 ROOT = Path(__file__).resolve().parents[1]
 PLANS_PATH = ROOT / "data" / "plans.json"
 VAT_SETTLED_PATH = ROOT / "data" / "vat_settled.json"
+DEPOSITS_PATH = ROOT / "data" / "deposits.json"
 BANK_PATH = ROOT / "data" / "bank_nh.json"
 OUTPUT_PATH = ROOT / "data" / "cashflow.json"
 KST = ZoneInfo("Asia/Seoul")
@@ -45,8 +55,8 @@ ASSUMPTIONS = [
     "매출 부가세는 1월, 4월, 7월, 10월에 납부합니다. 1–3월분은 4월, 4–6월분은 7월, 7–9월분은 10월, 10–12월분은 다음 해 1월입니다.",
     "2026년 7–9월 매출 부가세는 10월 통장 출금 3,542,780원으로 이미 납부했습니다. 매출 공급가액의 10%를 그 위에 다시 빼지 않습니다.",
     "매입세액 공제는 빼지 않습니다. 이미 통장에서 나간 부가세는 다시 빼지 않습니다.",
-    "예금 이자는 예상하지 않습니다. 예정 매출 외에 미래 매출은 0원이고, 예정 지출 외에 미래 매입은 0원입니다.",
-    "적요에 정기예금이 들어 있는 출금은 지출이 아닙니다. 원금은 만기에 통장으로 돌아오는 것으로 보고, 이자는 넣지 않습니다.",
+    "정기예금으로 적어 둔 이자만 만기에 넣고, 그 외 예금 이자는 예상하지 않습니다. 예정 매출 외에 미래 매출은 0원이고, 예정 지출 외에 미래 매입은 0원입니다.",
+    "적요에 정기예금이 들어 있는 출금은 지출이 아닙니다. 원금과 세후 이자는 만기에 통장으로 돌아오는 것으로 보고, 세전 이자에서 법인세 원천징수 14%와 지방소득세 1.4%(합계 15.4%)를 뗍니다. 금리는 data/deposits.json에 둡니다.",
 ]
 
 
@@ -129,7 +139,7 @@ def _valid_date(value: str) -> bool:
     return True
 
 
-def forecast_document(cash: dict, plans_doc: dict) -> dict:
+def forecast_document(cash: dict, plans_doc: dict, deposits_doc: list | dict | None = None) -> dict:
     """Rebuild forecast rows from cashflow actuals and a plans document.
 
     Bank figures already stored on the document stay as they are. This path
@@ -147,7 +157,10 @@ def forecast_document(cash: dict, plans_doc: dict) -> dict:
         year, month = str(label).split("-")
         balances[(int(year), int(month))] = int(amount)
     actuals = [_month_actual(row) for row in months]
-    deposits = _active_deposits(cash.get("deposits") or [], as_of)
+    deposits = _active_deposits(
+        _merge_deposit_items(cash.get("deposits") or [], _configured_deposits(deposits_doc)),
+        as_of,
+    )
     forecast = build_forecast(
         actuals,
         as_of,
@@ -281,7 +294,13 @@ def parse_bank_nh(payload: object) -> dict:
     }
 
 
-def assemble_cashflow(previous: dict, bank: dict, cards: dict | None, plans_doc: dict | None = None) -> dict:
+def assemble_cashflow(
+    previous: dict,
+    bank: dict,
+    cards: dict | None,
+    plans_doc: dict | None = None,
+    deposits_doc: list | dict | None = None,
+) -> dict:
     """Build a cashflow document from the last file, the NH account, and optional Jobis cards."""
     if "queriedOn" not in bank:
         bank = parse_bank_nh(bank)
@@ -292,11 +311,18 @@ def assemble_cashflow(previous: dict, bank: dict, cards: dict | None, plans_doc:
             else {"sales": [], "expenses": []}
         )
     plans_doc = normalize_plans(plans_doc)
-    merged = _merge_bank_and_cards(previous, bank, cards, plans_doc["sales"])
-    return forecast_document(merged, plans_doc)
+    configured = _configured_deposits(deposits_doc)
+    merged = _merge_bank_and_cards(previous, bank, cards, plans_doc["sales"], configured)
+    return forecast_document(merged, plans_doc, deposits_doc=configured)
 
 
-def _merge_bank_and_cards(previous: dict, bank: dict, cards: dict | None, plan_sales: list[dict]) -> dict:
+def _merge_bank_and_cards(
+    previous: dict,
+    bank: dict,
+    cards: dict | None,
+    plan_sales: list[dict],
+    configured: list[dict] | None = None,
+) -> dict:
     months = [dict(row) for row in previous.get("actuals") or []]
     for row in months:
         row["bankInLines"] = [dict(item) for item in row.get("bankInLines") or []]
@@ -351,7 +377,7 @@ def _merge_bank_and_cards(previous: dict, bank: dict, cards: dict | None, plan_s
         "asOf": queried.isoformat(),
         "currency": previous.get("currency") or "KRW",
         "cashNow": int(bank["balance"]),
-        "deposits": _collect_time_deposits(previous, bank, queried),
+        "deposits": _collect_time_deposits(previous, bank, queried, configured or []),
         "actuals": months,
         "balances": {f"{year}-{month:02d}": amount for (year, month), amount in sorted(balances.items())},
         "cardMix": card_mix,
@@ -462,18 +488,60 @@ def _fill_bank_row(row: dict, txns: list[dict], live_balance: int | None) -> Non
         row["endCash"] = int(last["balanceAfter"])
 
 
-def _collect_time_deposits(previous: dict, bank: dict, as_of: date) -> list[dict]:
-    """Time deposits from the bank file, kept from the last cashflow when the file no longer lists them."""
+def load_deposit_config(path: Path | None = None) -> list[dict]:
+    """Rates and terms for time deposits. See data/deposits.json."""
+    file = path or DEPOSITS_PATH
+    if not file.exists():
+        return []
+    payload = json.loads(file.read_text(encoding="utf-8"))
+    items = payload.get("deposits") if isinstance(payload, dict) else None
+    if not isinstance(items, list):
+        raise ValueError("deposits.json의 deposits는 목록이어야 합니다.")
+    return items
+
+
+def _configured_deposits(deposits_doc: list | dict | None) -> list[dict]:
+    if deposits_doc is None:
+        return load_deposit_config()
+    if isinstance(deposits_doc, dict):
+        items = deposits_doc.get("deposits") or []
+        if not isinstance(items, list):
+            raise ValueError("deposits 목록이 올바르지 않습니다.")
+        return items
+    if not isinstance(deposits_doc, list):
+        raise ValueError("deposits 목록이 올바르지 않습니다.")
+    return deposits_doc
+
+
+def _collect_time_deposits(
+    previous: dict, bank: dict, as_of: date, configured: list[dict] | None = None
+) -> list[dict]:
+    """Time deposits from the bank file, the config, and the last cashflow."""
+    return _active_deposits(
+        _merge_deposit_items(
+            list(previous.get("deposits") or []),
+            _time_deposits_from_transactions(bank.get("transactions") or []),
+            configured or [],
+        ),
+        as_of,
+    )
+
+
+def _merge_deposit_items(*groups: list) -> list[dict]:
     by_key: dict[tuple[str, int], dict] = {}
-    for item in list(previous.get("deposits") or []) + _time_deposits_from_transactions(bank.get("transactions") or []):
-        if not isinstance(item, dict):
-            continue
-        opened = str(item.get("opened") or "")
-        principal = item.get("principal")
-        if not _valid_date(opened) or not isinstance(principal, int) or isinstance(principal, bool) or principal <= 0:
-            continue
-        by_key[(opened, principal)] = item
-    return _active_deposits(list(by_key.values()), as_of)
+    for group in groups:
+        for item in group:
+            if not isinstance(item, dict):
+                continue
+            opened = str(item.get("opened") or "")
+            principal = item.get("principal")
+            if not _valid_date(opened) or not isinstance(principal, int) or isinstance(principal, bool) or principal <= 0:
+                continue
+            prev = by_key.get((opened, principal), {})
+            merged = dict(prev)
+            merged.update(item)
+            by_key[(opened, principal)] = merged
+    return list(by_key.values())
 
 
 def _time_deposits_from_transactions(txns: list[dict]) -> list[dict]:
@@ -512,6 +580,8 @@ def _active_deposits(items: list, as_of: date) -> list[dict]:
             continue
         if not _valid_date(opened) or not _valid_date(maturity):
             continue
+        if date.fromisoformat(opened) > as_of:
+            continue
         if date.fromisoformat(maturity) <= as_of:
             continue
         key = (opened, maturity, principal)
@@ -522,6 +592,14 @@ def _active_deposits(items: list, as_of: date) -> list[dict]:
         note = str(item.get("note") or "").strip()
         if note:
             row["note"] = note
+        rate = _parse_rate(item.get("rate"))
+        if rate is not None:
+            gross, tax, net = time_deposit_interest(principal, rate)
+            row["rate"] = float(rate)
+            row["grossInterest"] = gross
+            row["withholding"] = tax
+            row["netInterest"] = net
+            row["maturityAmount"] = principal + net
         active.append(row)
     active.sort(key=lambda row: (row["opened"], row["maturity"], row["principal"]))
     return active
@@ -534,9 +612,24 @@ def _time_deposit_models(items: list[dict]) -> list[TimeDeposit]:
             opened=date.fromisoformat(item["opened"]),
             maturity=date.fromisoformat(item["maturity"]),
             note=str(item.get("note") or "정기예금"),
+            rate=_parse_rate(item.get("rate")),
+            gross_interest=int(item.get("grossInterest") or 0),
+            withholding=int(item.get("withholding") or 0),
+            net_interest=int(item.get("netInterest") or 0),
         )
         for item in items
     ]
+
+
+def _parse_rate(value: object) -> Decimal | None:
+    if value is None or value == "":
+        return None
+    if isinstance(value, bool) or not isinstance(value, (int, float, str, Decimal)):
+        raise ValueError("정기예금 금리는 숫자여야 합니다.")
+    rate = Decimal(str(value))
+    if rate < 0:
+        raise ValueError("정기예금 금리는 0 이상이어야 합니다.")
+    return rate
 
 
 def _recognize_plan_deposits(row: dict, txns: list[dict], plans: list) -> None:

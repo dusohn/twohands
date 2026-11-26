@@ -246,7 +246,7 @@ class RefreshTest(unittest.TestCase):
                 "transactions": [],
             }
         )
-        updated = assemble_cashflow(previous, bank, None, _plans())
+        updated = assemble_cashflow(previous, bank, None, _plans(), deposits_doc=[])
         november = next(row for row in updated["actuals"] if row["month"] == 11)
         december = next(row for row in updated["actuals"] if row["month"] == 12)
         self.assertEqual(november["bankIn"], 61_600_000)
@@ -287,6 +287,11 @@ class RefreshTest(unittest.TestCase):
                     "opened": "2026-11-26",
                     "maturity": "2027-11-25",
                     "note": "정기예금",
+                    "rate": 3.63,
+                    "grossInterest": 1_815_000,
+                    "withholding": 279_510,
+                    "netInterest": 1_535_490,
+                    "maturityAmount": 51_535_490,
                 }
             ],
         )
@@ -296,10 +301,15 @@ class RefreshTest(unittest.TestCase):
         forecast = next(row for row in updated["rows"] if row["year"] == 2026 and row["month"] == 11)
         self.assertNotIn(50_000_000, [line["amount"] for line in forecast["expense"]])
         matured = next(row for row in updated["rows"] if row["year"] == 2027 and row["month"] == 11)
-        self.assertEqual(matured["bankIn"], 50_000_000)
+        self.assertEqual(matured["bankIn"], 51_535_490)
         self.assertEqual(matured["income"][0]["name"], "정기예금")
         self.assertEqual(matured["income"][0]["amount"], 50_000_000)
         self.assertIn("2027-11-25", matured["income"][0]["note"])
+        self.assertEqual(matured["income"][1]["name"], "정기예금 이자(세후)")
+        self.assertEqual(matured["income"][1]["amount"], 1_535_490)
+        self.assertIn("1,815,000", matured["income"][1]["note"])
+        self.assertIn("279,510", matured["income"][1]["note"])
+        self.assertIn("15.4%", matured["income"][1]["note"])
         self.assertIn("지출이 아닙니다", " ".join(updated["assumptions"]))
 
     def test_time_deposit_persists_when_the_bank_file_no_longer_lists_it(self):
@@ -326,7 +336,9 @@ class RefreshTest(unittest.TestCase):
         self.assertEqual(updated["totalFunds"], 79_000_000)
         self.assertEqual(updated["deposits"][0]["principal"], 50_000_000)
         matured = next(row for row in updated["rows"] if row["year"] == 2027 and row["month"] == 11)
-        self.assertEqual(matured["bankIn"], 50_000_000)
+        self.assertEqual(matured["bankIn"], 51_535_490)
+        self.assertEqual(updated["deposits"][0]["rate"], 3.63)
+        self.assertEqual(updated["deposits"][0]["netInterest"], 1_535_490)
 
     def test_matured_time_deposit_is_not_added_again(self):
         previous = _previous()

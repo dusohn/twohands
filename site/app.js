@@ -248,11 +248,19 @@ function depositKpis(data) {
   const deposits = data.deposits || [];
   if (!deposits.length) return "";
   const principal = deposits.reduce((sum, item) => sum + (item.principal || 0), 0);
-  const maturity = deposits.length === 1 && deposits[0].maturity
-    ? `만기 ${esc(deposits[0].maturity)}`
-    : `${deposits.length}건`;
+  const maturityAmount = deposits.reduce(
+    (sum, item) => sum + (item.maturityAmount || item.principal || 0),
+    0
+  );
+  const first = deposits[0];
+  const bits = [];
+  if (deposits.length === 1 && first.rate != null) bits.push(`금리 ${esc(String(first.rate))}%`);
+  if (deposits.length === 1 && first.maturity) bits.push(`만기 ${esc(first.maturity)}`);
+  if (deposits.length !== 1) bits.push(`${deposits.length}건`);
+  const label = bits.length ? `정기예금 (${bits.join(" · ")})` : "정기예금";
   const total = data.totalFunds != null ? data.totalFunds : data.cashNow + principal;
-  return `<div class="kpi"><div class="k">정기예금 (${maturity})</div><div class="v">${fmt(principal)}원</div></div>
+  return `<div class="kpi"><div class="k">${label}</div><div class="v">${fmt(principal)}원</div></div>
+      <div class="kpi"><div class="k">만기 수령액(세후)</div><div class="v">${fmt(maturityAmount)}원</div></div>
       <div class="kpi"><div class="k">통장+정기예금</div><div class="v">${fmt(total)}원</div></div>`;
 }
 

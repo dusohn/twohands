@@ -67,17 +67,32 @@ class PlannedExpense:
         return self.supply + self.vat
 
 
+# Corporate interest withholding: 14% income tax + 1.4% local income tax.
+INTEREST_WITHHOLDING_RATE = Decimal("0.154")
+
+
 @dataclass(frozen=True)
 class TimeDeposit:
     """A time deposit whose principal left the checking account and returns at maturity.
 
-    Interest is unknown and is not forecast.
+    A known rate is 1-year simple interest. Net interest is after 15.4% withholding.
     """
 
     principal: int
     opened: date
     maturity: date
     note: str = "정기예금"
+    rate: Decimal | None = None
+    gross_interest: int = 0
+    withholding: int = 0
+    net_interest: int = 0
+
+
+def time_deposit_interest(principal: int, rate: Decimal) -> tuple[int, int, int]:
+    """1-year simple interest, then 15.4% withholding (14% + 1.4%)."""
+    gross = half_up(Decimal(principal) * rate / Decimal("100"))
+    tax = half_up(Decimal(gross) * INTEREST_WITHHOLDING_RATE)
+    return gross, tax, gross - tax
 
 
 def vat_due(year: int, month: int) -> tuple[int, int]:
@@ -474,7 +489,7 @@ def apply_actual_balances(rows: list[dict], balances: dict[tuple[int, int], int]
 def _maturity_inflow(
     deposits: list[TimeDeposit], key: tuple[int, int], as_of: date
 ) -> tuple[int, list[dict]]:
-    """Principal returning to cash in this month, if maturity is still ahead of as_of."""
+    """Principal and after-tax interest returning to cash in this month, if maturity is still ahead of as_of."""
     total = 0
     lines: list[dict] = []
     for item in deposits:
@@ -482,7 +497,7 @@ def _maturity_inflow(
             continue
         if item.maturity <= as_of:
             continue
-        total += item.principal
+        total += item.principal + item.net_interest
         lines.append(
             {
                 "name": item.note or "정기예금",
@@ -490,6 +505,17 @@ def _maturity_inflow(
                 "note": f"{item.maturity.isoformat()} · 원금",
             }
         )
+        if item.net_interest:
+            lines.append(
+                {
+                    "name": "정기예금 이자(세후)",
+                    "amount": item.net_interest,
+                    "note": (
+                        f"세전 {_won(item.gross_interest)}원 · "
+                        f"제세 {_won(item.withholding)}원 (15.4%)"
+                    ),
+                }
+            )
     return total, lines
 
 
