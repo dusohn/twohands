@@ -244,6 +244,18 @@ function samePlans(left, right) {
   return JSON.stringify(normalizeList(left || [])) === JSON.stringify(normalizeList(right || []));
 }
 
+function depositKpis(data) {
+  const deposits = data.deposits || [];
+  if (!deposits.length) return "";
+  const principal = deposits.reduce((sum, item) => sum + (item.principal || 0), 0);
+  const maturity = deposits.length === 1 && deposits[0].maturity
+    ? `만기 ${esc(deposits[0].maturity)}`
+    : `${deposits.length}건`;
+  const total = data.totalFunds != null ? data.totalFunds : data.cashNow + principal;
+  return `<div class="kpi"><div class="k">정기예금 (${maturity})</div><div class="v">${fmt(principal)}원</div></div>
+      <div class="kpi"><div class="k">통장+정기예금</div><div class="v">${fmt(total)}원</div></div>`;
+}
+
 function renderDashboard(data, rows) {
   const opening = rows.map((_, index) => openingCash(data, rows, index));
   const net = rows.map((row) => row.bankIn - row.bankOut);
@@ -259,6 +271,7 @@ function renderDashboard(data, rows) {
   return `
     <div class="kpis">
       <div class="kpi"><div class="k">${esc(data.asOf)} 통장 잔고</div><div class="v">${fmt(data.cashNow)}원</div></div>
+      ${depositKpis(data)}
       <div class="kpi"><div class="k">${state.year} 매출 공급가액</div><div class="v pos">${fmt(yearSales)}원</div></div>
       <div class="kpi"><div class="k">12월말 현금</div><div class="v ${endCash < 0 ? "neg" : ""}">${fmt(endCash)}원</div></div>
       <div class="kpi"><div class="k">연중 최저 현금</div><div class="v ${minCash < 0 ? "neg" : ""}">${fmt(minCash)}원</div></div>

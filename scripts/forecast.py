@@ -67,6 +67,19 @@ class PlannedExpense:
         return self.supply + self.vat
 
 
+@dataclass(frozen=True)
+class TimeDeposit:
+    """A time deposit whose principal left the checking account and returns at maturity.
+
+    Interest is unknown and is not forecast.
+    """
+
+    principal: int
+    opened: date
+    maturity: date
+    note: str = "정기예금"
+
+
 def vat_due(year: int, month: int) -> tuple[int, int]:
     """Output VAT leaves the bank in the quarterly filing month.
 
@@ -103,6 +116,7 @@ def build_forecast(
     horizon_years: int = 3,
     expenses: list[PlannedExpense] | None = None,
     settled_vat: list[tuple[int, int]] | None = None,
+    time_deposits: list[TimeDeposit] | None = None,
 ) -> dict:
     if not actuals:
         raise ValueError("no actual months")
@@ -126,6 +140,7 @@ def build_forecast(
     booked_expenses = _open_expenses(expenses or [], as_of, month_complete)
     vat_by_month = _vat_by_month(actuals, booked, current, month_complete)
     settled = set(settled_vat or [])
+    deposits = time_deposits or []
 
     rows: list[dict] = []
     ordered = sorted(by_month)
@@ -140,7 +155,8 @@ def build_forecast(
         unpaid_vat = _vat_still_due(key, vat_by_month, row.vat_paid, settled)
         plan_supply, plan_gross = _plan_amounts(booked, key, row.sales)
         expense_supply, expense_gross = _expense_amounts(booked_expenses, key)
-        end_cash = cash_now - remaining_bill - unpaid_vat + plan_gross - expense_gross
+        maturity_in, maturity_lines = _maturity_inflow(deposits, key, as_of)
+        end_cash = cash_now - remaining_bill - unpaid_vat + plan_gross - expense_gross + maturity_in
         income, expense = _bank_lines(
             row.bank_in,
             row.bank_out,
@@ -150,6 +166,7 @@ def build_forecast(
             row.bank_in_lines,
         )
         income.extend(_sale_lines(booked, key, row.sales))
+        income.extend(maturity_lines)
         if remaining_bill:
             expense.append({"name": "카드 대금", "amount": remaining_bill, "note": "지난달 사용분"})
         if unpaid_vat:
@@ -159,11 +176,11 @@ def build_forecast(
             {
                 "year": row.year,
                 "month": row.month,
-                "status": "예정" if plan_supply or expense_supply else "진행",
+                "status": "예정" if plan_supply or expense_supply or maturity_in else "진행",
                 "sales": row.sales + plan_supply,
                 "purchase": row.purchase + expense_supply,
                 "card": anchor_card,
-                "bankIn": row.bank_in + plan_gross,
+                "bankIn": row.bank_in + plan_gross + maturity_in,
                 "bankOut": row.bank_out + remaining_bill + unpaid_vat + expense_gross,
                 "endCash": end_cash,
                 "income": income,
@@ -184,9 +201,11 @@ def build_forecast(
         plan_supply, plan_gross = _plan_amounts(booked, cursor, already_sales=0)
         expense_supply, expense_gross = _expense_amounts(booked_expenses, cursor)
         vat = _vat_still_due(cursor, vat_by_month, 0, settled)
+        maturity_in, maturity_lines = _maturity_inflow(deposits, cursor, as_of)
         bank_out = bill + vat + expense_gross
-        cash = cash - bank_out + plan_gross
+        cash = cash - bank_out + plan_gross + maturity_in
         income = _sale_lines(booked, cursor)
+        income.extend(maturity_lines)
         expense: list[dict] = []
         if bill:
             expense.append({"name": "카드 대금", "amount": bill, "note": "예상"})
@@ -197,11 +216,11 @@ def build_forecast(
             {
                 "year": cursor[0],
                 "month": cursor[1],
-                "status": "예정" if plan_supply or expense_supply else "예상",
+                "status": "예정" if plan_supply or expense_supply or maturity_in else "예상",
                 "sales": plan_supply,
                 "purchase": expense_supply,
                 "card": spend,
-                "bankIn": plan_gross,
+                "bankIn": plan_gross + maturity_in,
                 "bankOut": bank_out,
                 "endCash": cash,
                 "income": income,
@@ -450,6 +469,28 @@ def apply_actual_balances(rows: list[dict], balances: dict[tuple[int, int], int]
         key = (row["year"], row["month"])
         if key in balances:
             row["endCash"] = balances[key]
+
+
+def _maturity_inflow(
+    deposits: list[TimeDeposit], key: tuple[int, int], as_of: date
+) -> tuple[int, list[dict]]:
+    """Principal returning to cash in this month, if maturity is still ahead of as_of."""
+    total = 0
+    lines: list[dict] = []
+    for item in deposits:
+        if (item.maturity.year, item.maturity.month) != key:
+            continue
+        if item.maturity <= as_of:
+            continue
+        total += item.principal
+        lines.append(
+            {
+                "name": item.note or "정기예금",
+                "amount": item.principal,
+                "note": f"{item.maturity.isoformat()} · 원금",
+            }
+        )
+    return total, lines
 
 
 def _depletion(rows: list[dict]) -> dict | None:

@@ -20,7 +20,7 @@ from zoneinfo import ZoneInfo
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from forecast import MonthActual, PlannedExpense, PlannedSale, apply_actual_balances, build_forecast
+from forecast import MonthActual, PlannedExpense, PlannedSale, TimeDeposit, apply_actual_balances, build_forecast
 from jobis_client import JobisClient
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,6 +31,7 @@ OUTPUT_PATH = ROOT / "data" / "cashflow.json"
 KST = ZoneInfo("Asia/Seoul")
 FILING_MONTHS = {1, 4, 7, 10}
 ACCOUNT_MASK = re.compile(r"^\*+\d{4}$")
+MATURITY_RE = re.compile(r"만기\s*(\d{4}-\d{2}-\d{2})")
 CARD_FALLBACK_NOTE = "이번 계산은 자비스를 읽지 못해, 카드 사용액과 카드 구성을 마지막으로 저장한 금액으로 유지합니다."
 ASSUMPTIONS = [
     "통장 잔액과 통장 입출금은 농협 법인통장(****6481) 빠른조회입니다. 자비스의 통장 숫자는 쓰지 않습니다.",
@@ -45,6 +46,7 @@ ASSUMPTIONS = [
     "2026년 7–9월 매출 부가세는 10월 통장 출금 3,542,780원으로 이미 납부했습니다. 매출 공급가액의 10%를 그 위에 다시 빼지 않습니다.",
     "매입세액 공제는 빼지 않습니다. 이미 통장에서 나간 부가세는 다시 빼지 않습니다.",
     "예금 이자는 예상하지 않습니다. 예정 매출 외에 미래 매출은 0원이고, 예정 지출 외에 미래 매입은 0원입니다.",
+    "적요에 정기예금이 들어 있는 출금은 지출이 아닙니다. 원금은 만기에 통장으로 돌아오는 것으로 보고, 이자는 넣지 않습니다.",
 ]
 
 
@@ -145,6 +147,7 @@ def forecast_document(cash: dict, plans_doc: dict) -> dict:
         year, month = str(label).split("-")
         balances[(int(year), int(month))] = int(amount)
     actuals = [_month_actual(row) for row in months]
+    deposits = _active_deposits(cash.get("deposits") or [], as_of)
     forecast = build_forecast(
         actuals,
         as_of,
@@ -152,6 +155,7 @@ def forecast_document(cash: dict, plans_doc: dict) -> dict:
         sales,
         expenses=expenses,
         settled_vat=load_settled_vat(),
+        time_deposits=_time_deposit_models(deposits),
     )
     apply_actual_balances(forecast["rows"], balances)
     updated = dict(cash)
@@ -168,6 +172,8 @@ def forecast_document(cash: dict, plans_doc: dict) -> dict:
     updated["depletion"] = forecast["depletion"]
     updated["plans"] = document["sales"]
     updated["expenses"] = document["expenses"]
+    updated["deposits"] = deposits
+    updated["totalFunds"] = int(cash["cashNow"]) + sum(item["principal"] for item in deposits)
     updated["actuals"] = months
     updated["balances"] = {f"{year}-{month:02d}": amount for (year, month), amount in sorted(balances.items())}
     updated["rows"] = forecast["rows"]
@@ -345,6 +351,7 @@ def _merge_bank_and_cards(previous: dict, bank: dict, cards: dict | None, plan_s
         "asOf": queried.isoformat(),
         "currency": previous.get("currency") or "KRW",
         "cashNow": int(bank["balance"]),
+        "deposits": _collect_time_deposits(previous, bank, queried),
         "actuals": months,
         "balances": {f"{year}-{month:02d}": amount for (year, month), amount in sorted(balances.items())},
         "cardMix": card_mix,
@@ -436,7 +443,7 @@ def _fill_bank_row(row: dict, txns: list[dict], live_balance: int | None) -> Non
         text = f"{tx['description']} {tx['memo']}"
         if tx["deposit"]:
             incoming[name] += tx["deposit"]
-        if tx["withdrawal"]:
+        if tx["withdrawal"] and "정기예금" not in text:
             outgoing[name] += tx["withdrawal"]
             if "카드" in text:
                 card_paid += tx["withdrawal"]
@@ -453,6 +460,83 @@ def _fill_bank_row(row: dict, txns: list[dict], live_balance: int | None) -> Non
     elif txns:
         last = max(txns, key=lambda item: item["datetime"])
         row["endCash"] = int(last["balanceAfter"])
+
+
+def _collect_time_deposits(previous: dict, bank: dict, as_of: date) -> list[dict]:
+    """Time deposits from the bank file, kept from the last cashflow when the file no longer lists them."""
+    by_key: dict[tuple[str, int], dict] = {}
+    for item in list(previous.get("deposits") or []) + _time_deposits_from_transactions(bank.get("transactions") or []):
+        if not isinstance(item, dict):
+            continue
+        opened = str(item.get("opened") or "")
+        principal = item.get("principal")
+        if not _valid_date(opened) or not isinstance(principal, int) or isinstance(principal, bool) or principal <= 0:
+            continue
+        by_key[(opened, principal)] = item
+    return _active_deposits(list(by_key.values()), as_of)
+
+
+def _time_deposits_from_transactions(txns: list[dict]) -> list[dict]:
+    found: list[dict] = []
+    for tx in txns:
+        if int(tx.get("withdrawal") or 0) <= 0:
+            continue
+        text = f"{tx.get('description') or ''} {tx.get('memo') or ''}"
+        if "정기예금" not in text:
+            continue
+        match = MATURITY_RE.search(text)
+        if not match or not _valid_date(match.group(1)):
+            continue
+        opened = datetime.fromisoformat(tx["datetime"]).date().isoformat()
+        found.append(
+            {
+                "principal": int(tx["withdrawal"]),
+                "opened": opened,
+                "maturity": match.group(1),
+                "note": "정기예금",
+            }
+        )
+    return found
+
+
+def _active_deposits(items: list, as_of: date) -> list[dict]:
+    active: list[dict] = []
+    seen: set[tuple[str, str, int]] = set()
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        principal = item.get("principal")
+        opened = str(item.get("opened") or "")
+        maturity = str(item.get("maturity") or "")
+        if not isinstance(principal, int) or isinstance(principal, bool) or principal <= 0:
+            continue
+        if not _valid_date(opened) or not _valid_date(maturity):
+            continue
+        if date.fromisoformat(maturity) <= as_of:
+            continue
+        key = (opened, maturity, principal)
+        if key in seen:
+            continue
+        seen.add(key)
+        row = {"principal": principal, "opened": opened, "maturity": maturity, "note": "정기예금"}
+        note = str(item.get("note") or "").strip()
+        if note:
+            row["note"] = note
+        active.append(row)
+    active.sort(key=lambda row: (row["opened"], row["maturity"], row["principal"]))
+    return active
+
+
+def _time_deposit_models(items: list[dict]) -> list[TimeDeposit]:
+    return [
+        TimeDeposit(
+            principal=item["principal"],
+            opened=date.fromisoformat(item["opened"]),
+            maturity=date.fromisoformat(item["maturity"]),
+            note=str(item.get("note") or "정기예금"),
+        )
+        for item in items
+    ]
 
 
 def _recognize_plan_deposits(row: dict, txns: list[dict], plans: list) -> None:

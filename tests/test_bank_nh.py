@@ -109,13 +109,17 @@ class BankFileTest(unittest.TestCase):
         self.assertGreater(bank["balance"], 0)
         self.assertTrue(bank["transactions"])
 
-    def test_seed_amounts_are_the_2026_11_25_lookup(self):
+    def test_seed_amounts_are_the_2026_11_26_lookup(self):
         bank = load_bank_nh()
-        self.assertEqual(bank["queriedOn"].isoformat(), "2026-11-25")
-        self.assertEqual(bank["balance"], 88_114_537)
+        self.assertEqual(bank["queriedOn"].isoformat(), "2026-11-26")
+        self.assertEqual(bank["balance"], 29_172_844)
+        self.assertEqual(bank["transactions"][0]["description"], "정기예금")
         self.assertEqual(
             [(row["deposit"], row["withdrawal"], row["balanceAfter"], row["memo"]) for row in bank["transactions"]],
             [
+                (0, 50_000_000, 29_172_844, "정기예금 가입 (1년, 만기 2027-11-25)"),
+                (0, 8_919_693, 79_172_844, "현대카드대금"),
+                (0, 22_000, 88_092_537, "NH기업카드"),
                 (61_600_000, 0, 88_114_537, "(주)더린킨"),
                 (0, 450_600, 26_514_537, "현대카드"),
             ],
@@ -252,6 +256,98 @@ class RefreshTest(unittest.TestCase):
         self.assertEqual(december["bankOut"], 0)
         self.assertEqual(updated["cashNow"], 88_000_000)
         self.assertEqual(updated["balances"]["2026-12"], 88_000_000)
+
+    def test_time_deposit_withdrawal_is_not_an_expense_and_returns_at_maturity(self):
+        bank = {
+            "account": "****6481",
+            "queriedAt": "2026-11-26T09:19:05+09:00",
+            "balance": 29_172_844,
+            "available": 29_172_844,
+            "transactions": [
+                {
+                    "datetime": "2026-11-26T09:19:00+09:00",
+                    "deposit": 0,
+                    "withdrawal": 50_000_000,
+                    "balanceAfter": 29_172_844,
+                    "description": "정기예금",
+                    "memo": "정기예금 가입 (1년, 만기 2027-11-25)",
+                },
+                *_today_bank()["transactions"],
+            ],
+        }
+        updated = assemble_cashflow(_previous(), bank, None, _plans())
+        self.assertEqual(updated["cashNow"], 29_172_844)
+        self.assertEqual(updated["totalFunds"], 79_172_844)
+        self.assertEqual(updated["baseExpense"], 4_397_291)
+        self.assertEqual(
+            updated["deposits"],
+            [
+                {
+                    "principal": 50_000_000,
+                    "opened": "2026-11-26",
+                    "maturity": "2027-11-25",
+                    "note": "정기예금",
+                }
+            ],
+        )
+        november = next(row for row in updated["actuals"] if row["month"] == 11)
+        self.assertEqual(november["bankOut"], 450_600)
+        self.assertNotIn(50_000_000, [line["amount"] for line in november["bankOutLines"]])
+        forecast = next(row for row in updated["rows"] if row["year"] == 2026 and row["month"] == 11)
+        self.assertNotIn(50_000_000, [line["amount"] for line in forecast["expense"]])
+        matured = next(row for row in updated["rows"] if row["year"] == 2027 and row["month"] == 11)
+        self.assertEqual(matured["bankIn"], 50_000_000)
+        self.assertEqual(matured["income"][0]["name"], "정기예금")
+        self.assertEqual(matured["income"][0]["amount"], 50_000_000)
+        self.assertIn("2027-11-25", matured["income"][0]["note"])
+        self.assertIn("지출이 아닙니다", " ".join(updated["assumptions"]))
+
+    def test_time_deposit_persists_when_the_bank_file_no_longer_lists_it(self):
+        previous = _previous()
+        previous["deposits"] = [
+            {
+                "principal": 50_000_000,
+                "opened": "2026-11-26",
+                "maturity": "2027-11-25",
+                "note": "정기예금",
+            }
+        ]
+        bank = parse_bank_nh(
+            {
+                "account": "****6481",
+                "queriedAt": "2026-12-01T06:40:00+09:00",
+                "balance": 29_000_000,
+                "available": 29_000_000,
+                "transactions": [],
+            }
+        )
+        updated = assemble_cashflow(previous, bank, None, _plans())
+        self.assertEqual(updated["cashNow"], 29_000_000)
+        self.assertEqual(updated["totalFunds"], 79_000_000)
+        self.assertEqual(updated["deposits"][0]["principal"], 50_000_000)
+        matured = next(row for row in updated["rows"] if row["year"] == 2027 and row["month"] == 11)
+        self.assertEqual(matured["bankIn"], 50_000_000)
+
+    def test_matured_time_deposit_is_not_added_again(self):
+        previous = _previous()
+        previous["deposits"] = [
+            {
+                "principal": 50_000_000,
+                "opened": "2026-11-26",
+                "maturity": "2027-11-25",
+                "note": "정기예금",
+            }
+        ]
+        previous["asOf"] = "2027-11-25"
+        previous["cashNow"] = 80_000_000
+        # forecast_document needs actuals to include the as-of month
+        previous["actuals"].append(_month(2027, 11))
+        previous["balances"]["2027-11"] = 80_000_000
+        updated = forecast_document(previous, {"sales": [], "expenses": []})
+        self.assertEqual(updated["deposits"], [])
+        self.assertEqual(updated["totalFunds"], 80_000_000)
+        november = next(row for row in updated["rows"] if row["year"] == 2027 and row["month"] == 11)
+        self.assertEqual(november["bankIn"], 0)
 
     def test_plan_rebuild_does_not_pull_bank_numbers_from_the_old_statement(self):
         cash = _previous()

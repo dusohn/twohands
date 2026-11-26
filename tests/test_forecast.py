@@ -9,6 +9,7 @@ from forecast import (
     MonthActual,
     PlannedExpense,
     PlannedSale,
+    TimeDeposit,
     apply_actual_balances,
     build_forecast,
     vat_due,
@@ -295,6 +296,29 @@ class ForecastTest(unittest.TestCase):
         self.assertEqual(by[(2026, 12)]["endCash"], 7_800_000)
         self.assertEqual(by[(2027, 1)]["bankOut"], 100_000)
 
+
+    def test_time_deposit_principal_returns_in_the_maturity_month(self):
+        actuals = [
+            month(2026, 10, card=3_000_000),
+            month(2026, 11, card=3_000_000, bank_out=200_000, card_paid=200_000),
+        ]
+        forecast = build_forecast(
+            actuals,
+            date(2026, 11, 26),
+            29_000_000,
+            [],
+            time_deposits=[
+                TimeDeposit(50_000_000, date(2026, 11, 26), date(2027, 11, 25), "정기예금"),
+            ],
+        )
+        self.assertEqual(forecast["baseExpense"], 3_000_000)
+        november = next(row for row in forecast["rows"] if row["year"] == 2026 and row["month"] == 11)
+        self.assertNotIn(50_000_000, [line["amount"] for line in november["expense"]])
+        matured = next(row for row in forecast["rows"] if row["year"] == 2027 and row["month"] == 11)
+        self.assertEqual(matured["bankIn"], 50_000_000)
+        self.assertEqual(matured["income"][0]["amount"], 50_000_000)
+        october = next(row for row in forecast["rows"] if row["year"] == 2027 and row["month"] == 10)
+        self.assertEqual(matured["endCash"], october["endCash"] - matured["bankOut"] + 50_000_000)
 
 if __name__ == "__main__":
     unittest.main()
